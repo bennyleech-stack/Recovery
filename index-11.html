@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Re:Cover"/>
+<meta name="theme-color" content="#A8E6C3"/>
+<title>Re:Cover Companion</title>
+<!--
+  ICON SWAP: Replace favicon link with:
+  <link rel="icon" href="favicon.ico"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link rel="manifest" href="manifest.json"/>
+  Manifest template at bottom of file.
+-->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --mint:#A8E6C3;--mint-dark:#6DD4A0;--mint-soft:#E4F8EE;
+  --rose:#F2A7B8;--rose-dark:#E87A98;--rose-soft:#FDF0F4;
+  --yellow:#FFE066;--yellow-dark:#F5C800;--yellow-soft:#FFFBE0;
+  --lav:#C9B8F0;--lav-dark:#9B7FE0;--lav-soft:#F0EBF9;
+  --sky:#B8DFF2;--sky-dark:#5AAAD4;--sky-soft:#EAF5FB;
+  --peach:#FFD0B0;--peach-dark:#F5934A;--peach-soft:#FFF3EA;
+  --white:#FFF;--offwhite:#FAFBF9;
+  --text:#2D3A30;--text-soft:#6B7E70;--text-xsoft:#A8B8A8;
+  --radius-lg:20px;--radius-xl:28px;--radius-pill:999px;
+  --shadow-card:0 2px 12px rgba(0,0,0,.06);--shadow-modal:0 -8px 40px rgba(0,0,0,.12);
+  --nav-h:70px;
+  --font-body:'Nunito',sans-serif;--font-disp:'Fredoka One',cursive;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:var(--font-body);background:var(--offwhite);color:var(--text);-webkit-tap-highlight-color:transparent;font-size:15px}
+#app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 16px calc(var(--nav-h) + 24px);display:none}
+.screen.active{display:block}
+.screen::-webkit-scrollbar{width:0}
+
+/* NAV */
+#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:var(--nav-h);background:var(--white);border-top:2px solid #eef2ed;display:flex;align-items:center;justify-content:space-around;z-index:200;padding-bottom:env(safe-area-inset-bottom,0px);pointer-events:all}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;padding:8px 8px;border-radius:var(--radius-lg);cursor:pointer;transition:transform .15s,background .15s;min-width:52px}
+.nav-btn:active{transform:scale(.92)}
+.nav-btn.active{background:var(--mint-soft)}
+.nav-icon{font-size:20px;line-height:1;transition:transform .2s}
+.nav-btn.active .nav-icon{transform:scale(1.15)}
+.nav-label{font-size:9px;font-weight:700;color:var(--text-soft);letter-spacing:.3px;text-transform:uppercase}
+.nav-btn.active .nav-label{color:var(--mint-dark)}
+
+/* TYPE */
+h1{font-family:var(--font-disp);font-size:28px;line-height:1.2}
+h2{font-family:var(--font-disp);font-size:20px}
+h3{font-size:15px;font-weight:800}
+p{line-height:1.5}
+
+/* CARDS */
+.card{background:var(--white);border-radius:var(--radius-xl);padding:18px;margin-bottom:14px;box-shadow:var(--shadow-card)}
+.card-mint{background:var(--mint-soft);border:2px solid var(--mint)}
+.card-rose{background:var(--rose-soft);border:2px solid var(--rose)}
+.card-yellow{background:var(--yellow-soft);border:2px solid var(--yellow)}
+.card-lav{background:var(--lav-soft);border:2px solid var(--lav)}
+.card-sky{background:var(--sky-soft);border:2px solid var(--sky)}
+.card-peach{background:var(--peach-soft);border:2px solid var(--peach)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-icon{font-size:26px}
+
+/* BADGES */
+.badge{display:inline-block;padding:4px 12px;border-radius:var(--radius-pill);font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.badge-mint{background:var(--mint);color:#1a4a30}
+.badge-rose{background:var(--rose);color:#5c1a2a}
+.badge-yellow{background:var(--yellow);color:#5c4200}
+.badge-lav{background:var(--lav);color:#3d2a6e}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:var(--radius-pill);padding:13px 22px;font-family:var(--font-body);font-size:14px;font-weight:800;cursor:pointer;transition:transform .15s,box-shadow .15s;-webkit-user-select:none}
+.btn:active{transform:scale(.95)}
+.btn-mint{background:var(--mint-dark);color:#fff;box-shadow:0 4px 14px rgba(109,212,160,.4)}
+.btn-rose{background:var(--rose-dark);color:#fff;box-shadow:0 4px 14px rgba(232,122,152,.4)}
+.btn-yellow{background:var(--yellow);color:var(--text);box-shadow:0 4px 14px rgba(255,224,102,.5)}
+.btn-lav{background:var(--lav-dark);color:#fff;box-shadow:0 4px 14px rgba(155,127,224,.4)}
+.btn-peach{background:var(--peach-dark);color:#fff;box-shadow:0 4px 14px rgba(245,147,74,.4)}
+.btn-ghost{background:transparent;color:var(--text-soft);border:2px solid #dde8da}
+.btn-danger{background:#fee;color:#c00;border:2px solid #fcc}
+.btn-full{width:100%}
+.btn-sm{padding:8px 16px;font-size:13px}
+.btn-xs{padding:5px 11px;font-size:11px;font-weight:800}
+
+/* PROGRESS */
+.progress-track{background:#e8f0e5;border-radius:var(--radius-pill);height:12px;overflow:hidden}
+.progress-fill{height:100%;border-radius:var(--radius-pill);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.prog-mint{background:linear-gradient(90deg,var(--mint-dark),var(--mint))}
+.prog-rose{background:linear-gradient(90deg,var(--rose-dark),var(--rose))}
+.prog-lav{background:linear-gradient(90deg,var(--lav-dark),var(--lav))}
+
+/* FORM ELEMENTS */
+input[type=number],input[type=text],input[type=date],textarea,select{
+  width:100%;border:2.5px solid #dde8da;border-radius:var(--radius-lg);padding:11px 14px;
+  font-family:var(--font-body);font-size:14px;font-weight:700;color:var(--text);
+  background:var(--white);outline:none;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--mint-dark)}
+textarea{resize:none;line-height:1.5}
+select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7E70' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #f0f4ef}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row-info{flex:1;padding-right:12px}
+.toggle-row-info strong{display:block;font-size:14px;font-weight:800;color:var(--text)}
+.toggle-row-info span{display:block;font-size:11px;color:var(--text-soft);margin-top:2px}
+.toggle{position:relative;width:48px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#d0ddd0;border-radius:26px;transition:.25s;cursor:pointer}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.25s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.toggle input:checked+.toggle-slider{background:var(--mint-dark)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(22px)}
+
+/* ANTI-GUILT */
+.anti-guilt{background:var(--yellow-soft);border:2px dashed var(--yellow-dark);border-radius:var(--radius-lg);padding:11px 14px;font-size:12px;font-weight:700;color:#5c4200;text-align:center;margin-top:10px;line-height:1.5}
+
+/* SECTION HEAD */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:20px 0 12px}
+.sec-head h2{font-size:19px}
+
+/* ANIM */
+.card{animation:slideUp .3s ease both}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}60%{transform:translateY(-6px)}}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes breathe{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(168,230,195,.5)}50%{transform:scale(1.3);box-shadow:0 0 0 20px rgba(168,230,195,0)}}
+@keyframes bigBounce{0%{transform:scale(.3)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── CHECK-IN WIZARD OVERLAY ── */
+#checkin-overlay{position:fixed;inset:0;background:linear-gradient(160deg,var(--mint-soft),var(--lav-soft));z-index:400;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;text-align:center}
+#checkin-overlay.open{display:flex}
+.ci-icon{font-size:60px;animation:bounce 1.5s infinite;margin-bottom:16px}
+.ci-title{font-family:var(--font-disp);font-size:26px;margin-bottom:6px}
+.ci-sub{font-size:13px;color:var(--text-soft);margin-bottom:24px;line-height:1.5}
+.ci-step-indicator{display:flex;gap:6px;margin-bottom:20px}
+.ci-dot{width:8px;height:8px;border-radius:50%;background:#dde8da;transition:background .2s}
+.ci-dot.active{background:var(--mint-dark)}
+.ci-dot.done{background:var(--mint)}
+/* scale grids */
+.scale-grid{display:grid;gap:8px;width:100%;margin-bottom:16px}
+.scale-grid-5{grid-template-columns:repeat(5,1fr)}
+.scale-grid-10{grid-template-columns:repeat(5,1fr)}
+.scale-btn{border:2.5px solid transparent;border-radius:16px;padding:10px 4px;font-family:var(--font-disp);font-size:18px;cursor:pointer;transition:transform .15s;background:var(--white);box-shadow:var(--shadow-card);display:flex;flex-direction:column;align-items:center;gap:3px}
+.scale-btn span.lb{font-family:var(--font-body);font-size:10px;font-weight:700;color:var(--text-soft)}
+.scale-btn:active{transform:scale(.9)}
+.scale-btn.sel{transform:scale(1.08)}
+.scale-btn.sel-mint{border-color:var(--mint-dark);background:var(--mint-soft)}
+.scale-btn.sel-rose{border-color:var(--rose-dark);background:var(--rose-soft)}
+.scale-btn.sel-yellow{border-color:var(--yellow-dark);background:var(--yellow-soft)}
+.scale-btn.sel-lav{border-color:var(--lav-dark);background:var(--lav-soft)}
+.ci-skip{background:none;border:none;color:var(--text-xsoft);font-family:var(--font-body);font-size:12px;font-weight:700;cursor:pointer;padding:8px;margin-top:4px}
+.ci-nav{display:flex;gap:10px;width:100%;margin-top:8px}
+.ci-nav .btn{flex:1}
+
+/* ── HOME ── */
+.home-header{text-align:center;padding:8px 0 18px}
+.home-app-icon{font-size:52px;animation:bounce 2s infinite;display:block;margin-bottom:8px}
+.mode-tag{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--radius-pill);font-size:13px;font-weight:800;margin-bottom:16px}
+.mode-tag-recovery{background:var(--rose);color:#5c1a2a}
+.mode-tag-active{background:var(--mint);color:#1a4a30}
+.affirmation-card{background:linear-gradient(135deg,var(--mint-dark),var(--rose));border-radius:var(--radius-xl);padding:20px;color:#fff;text-align:center;margin-bottom:14px}
+.affirmation-card p{font-family:var(--font-disp);font-size:17px;line-height:1.4}
+.quick-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--white);border-radius:var(--radius-xl);padding:14px;text-align:center;box-shadow:var(--shadow-card)}
+.stat-val{font-family:var(--font-disp);font-size:28px;color:var(--mint-dark)}
+.stat-label{font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+/* ── DAILY SUMMARY STRIP ── */
+.day-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.day-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius-pill);background:var(--white);box-shadow:var(--shadow-card);font-size:12px;font-weight:800;color:var(--text-soft)}
+.day-pill .dp-val{color:var(--text);font-size:13px}
+
+/* ── FLAG FOR DOCTOR ── */
+.flag-btn{display:inline-flex;align-items:center;gap:4px;border:none;border-radius:var(--radius-pill);padding:4px 10px;font-family:var(--font-body);font-size:11px;font-weight:800;cursor:pointer;transition:transform .15s;background:var(--yellow-soft);color:#8a6e00;border:1.5px solid var(--yellow)}
+.flag-btn:active{transform:scale(.93)}
+.flag-btn.flagged{background:var(--yellow);color:#5c4200}
+.flagged-list-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--yellow-soft);border-radius:var(--radius-lg);margin-bottom:8px;border-left:3px solid var(--yellow-dark)}
+.fli-text{flex:1;font-size:13px;font-weight:700;color:var(--text);line-height:1.4}
+.fli-date{font-size:11px;color:var(--text-soft)}
+.fli-del{background:none;border:none;cursor:pointer;font-size:14px;opacity:.4;padding:2px}
+
+/* ── CALENDAR ── */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-nav h3{font-size:17px;font-family:var(--font-disp)}
+.cal-nav-btn{border:none;background:var(--white);border-radius:50%;width:34px;height:34px;font-size:18px;cursor:pointer;box-shadow:var(--shadow-card);display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px}
+.cal-day-label{text-align:center;font-size:10px;font-weight:800;color:var(--text-soft);padding-bottom:6px;text-transform:uppercase}
+.cal-day{aspect-ratio:1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer;position:relative;transition:transform .12s}
+.cal-day:active{transform:scale(.9)}
+.cal-day.empty{pointer-events:none}
+.cal-day.today{box-shadow:0 0 0 2px var(--mint-dark)}
+.cal-day.selected{box-shadow:0 0 0 2.5px var(--lav-dark)}
+.cal-day .cal-dot{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--text-soft)}
+/* fatigue colours */
+.cf-none{background:#f0f4ef;color:var(--text-soft)}
+.cf-1,.cf-2,.cf-3,.cf-4{background:#c8f0da;color:#1a4a30}
+.cf-5,.cf-6,.cf-7{background:#ffe8a0;color:#5c4200}
+.cf-8,.cf-9,.cf-10{background:#fcc8d4;color:#5c1a2a}
+
+/* DAY DETAIL PANEL */
+#day-detail{background:var(--white);border-radius:var(--radius-xl);padding:18px;margin-bottom:14px;box-shadow:var(--shadow-card);display:none}
+#day-detail.open{display:block;animation:fadeIn .2s ease}
+.dd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.dd-date{font-family:var(--font-disp);font-size:17px}
+/* DOCTOR NOTES */
+.doc-note-group{margin-bottom:16px}
+.doc-note-group-date{font-size:11px;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding-bottom:4px;border-bottom:1.5px solid #eef2ed}
+.doc-note-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-lg);margin-bottom:6px;background:var(--offwhite);border:1.5px solid #e8f0e5;transition:background .2s,opacity .2s}
+.doc-note-item.raised{opacity:.5;background:#f8f8f8}
+.doc-note-checkbox{width:22px;height:22px;border-radius:7px;border:2.5px solid var(--yellow-dark);background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:background .15s;margin-top:1px;font-size:13px}
+.doc-note-item.raised .doc-note-checkbox{background:var(--mint-dark);border-color:var(--mint-dark)}
+.doc-note-text{flex:1;font-size:13px;font-weight:700;color:var(--text);line-height:1.5;cursor:pointer}
+.doc-note-item.raised .doc-note-text{text-decoration:line-through;color:var(--text-soft)}
+.doc-note-del{background:none;border:none;font-size:13px;cursor:pointer;opacity:.3;padding:2px;flex-shrink:0}
+/* TREND REPORT */
+.period-btn{border:2px solid #dde8da;border-radius:var(--radius-pill);padding:6px 14px;font-family:var(--font-body);font-size:12px;font-weight:800;cursor:pointer;background:var(--white);color:var(--text-soft);transition:all .15s}
+.period-btn.active{background:var(--mint-dark);border-color:var(--mint-dark);color:#fff}
+.metric-toggle{display:inline-flex;align-items:center;gap:5px;border:2px solid transparent;border-radius:var(--radius-pill);padding:5px 11px;font-family:var(--font-body);font-size:11px;font-weight:800;cursor:pointer;transition:all .15s;opacity:.45;background:var(--white)}
+.metric-toggle.on{opacity:1;border-color:currentColor}
+.mt-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+#trend-chart{height:200px}
+.trend-legend-item{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--text-soft)}
+.tl-line{width:18px;height:3px;border-radius:2px;display:inline-block}
+.dd-edit-btn{background:none;border:1.5px solid var(--mint);border-radius:var(--radius-pill);padding:4px 11px;font-family:var(--font-body);font-size:11px;font-weight:800;color:var(--mint-dark);cursor:pointer}
+.dd-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.dd-metric{background:var(--white);border-radius:var(--radius-lg);padding:9px 11px}
+.dd-metric-label{font-size:10px;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.dd-metric-val{font-family:var(--font-disp);font-size:18px;color:var(--text)}
+
+/* EDIT DAY MODAL */
+#edit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:600;display:none;align-items:flex-end;justify-content:center}
+#edit-modal-overlay.open{display:flex}
+#edit-modal{width:100%;max-width:480px;background:var(--white);border-radius:28px 28px 0 0;padding:20px 20px 48px;max-height:85dvh;overflow-y:auto;box-shadow:var(--shadow-modal)}
+.edit-field{margin-bottom:14px}
+.edit-field label{display:block;font-size:12px;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+
+/* ── MOVES ── */
+.exercise-item{display:flex;align-items:flex-start;gap:12px;padding:13px;background:var(--white);border-radius:var(--radius-lg);margin-bottom:10px;box-shadow:var(--shadow-card);border-left:4px solid var(--mint-dark)}
+.ex-icon{font-size:26px;flex-shrink:0}
+.ex-badge{display:inline-block;margin-top:7px;font-size:11px;font-weight:800;padding:3px 10px;border-radius:var(--radius-pill)}
+.level-strip{display:flex;align-items:center;justify-content:space-between;margin-top:9px;padding-top:9px;border-top:1.5px dashed #e0ece5}
+.level-pips{display:flex;gap:4px;align-items:center}
+.level-pip{width:8px;height:8px;border-radius:50%;background:#e0ece5;transition:background .3s,transform .2s}
+.pip-fill{background:var(--mint-dark)}
+.pip-fill-rose{background:var(--rose-dark)}
+.pip-fill-lav{background:var(--lav-dark)}
+.pip-cur{transform:scale(1.4);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--mint-dark)}
+.pip-cur-rose{transform:scale(1.4);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--rose-dark)}
+.pip-cur-lav{transform:scale(1.4);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--lav-dark)}
+.lv-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.lv-ctrl{display:inline-flex;align-items:center;gap:4px;border-radius:var(--radius-pill);padding:5px 11px;font-family:var(--font-body);font-size:11px;font-weight:800;cursor:pointer;transition:transform .15s}
+.lv-ctrl:active{transform:scale(.93)}
+
+/* ── FUEL ── */
+.droplet-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin:10px 0}
+.droplet{font-size:24px;cursor:pointer;transition:transform .2s,filter .2s;filter:grayscale(1) opacity(.28);line-height:1;text-align:center;-webkit-user-select:none}
+.droplet.filled{filter:none;animation:pop .25s cubic-bezier(.34,1.56,.64,1)}
+.check-list{list-style:none}
+.check-list li{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px dashed #e8f0e5;font-size:13px;font-weight:700;cursor:pointer}
+.check-list li:last-child{border-bottom:none}
+.check-box{width:24px;height:24px;border-radius:7px;border:2.5px solid var(--rose-dark);background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;font-size:14px}
+.check-list li.done .check-box{background:var(--rose-dark);border-color:var(--rose-dark)}
+
+/* ── LOGS ── */
+.log-entry{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;background:var(--white);border-radius:var(--radius-lg);margin-bottom:8px;box-shadow:var(--shadow-card);font-size:13px;gap:8px}
+.le-val{font-family:var(--font-disp);font-size:18px;color:var(--rose-dark);white-space:nowrap}
+.le-date{color:var(--text-soft);font-size:12px;flex-shrink:0}
+.le-del{background:none;border:none;font-size:14px;cursor:pointer;opacity:.4;padding:3px;flex-shrink:0}
+canvas{display:block}
+#alt-chart{width:100%;height:150px;border-radius:var(--radius-lg);background:var(--white);margin-top:12px;border:2px solid #f0e8ea}
+#fatigue-chart{width:100%;height:110px;border-radius:var(--radius-lg);background:var(--white)}
+
+/* DRAIN LOG */
+.drain-entry{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed #e8f0e5}
+.drain-entry:last-child{border-bottom:none}
+.drain-swatch{width:16px;height:16px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* PHASE */
+.phase-track{display:flex;gap:0;position:relative;padding:12px 0 8px}
+.phase-track::before{content:'';position:absolute;top:20px;left:14px;right:14px;height:3px;background:#e0ece5;border-radius:2px;z-index:0}
+.phase-step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;z-index:1;cursor:pointer}
+.phase-dot{width:26px;height:26px;border-radius:50%;border:3px solid #e0ece5;background:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .3s;box-shadow:0 2px 5px rgba(0,0,0,.08)}
+.phase-dot.done{background:var(--mint-dark);border-color:var(--mint-dark)}
+.phase-dot.active{background:var(--yellow);border-color:var(--yellow-dark);transform:scale(1.2);box-shadow:0 0 0 4px rgba(255,224,102,.3)}
+.phase-dot.future{opacity:.4}
+.phase-name{font-size:8.5px;font-weight:800;text-align:center;color:var(--text-soft);text-transform:uppercase;letter-spacing:.3px;line-height:1.2}
+.phase-name.active-lbl{color:var(--text)}
+
+/* ONCOLOGIST EXPORT */
+.onc-section{margin-bottom:14px}
+.onc-section h3{font-size:11px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;font-weight:800;padding-bottom:4px;border-bottom:1.5px solid #eef2ed}
+.onc-row{display:flex;justify-content:space-between;align-items:flex-start;padding:5px 0;border-bottom:1px solid #f4f6f3;font-size:12px;gap:8px}
+.onc-row:last-child{border-bottom:none}
+.onc-key{color:var(--text-soft);font-weight:600;flex-shrink:0}
+.onc-val{font-weight:800;color:var(--text);text-align:right}
+.onc-flag{color:var(--yellow-dark);font-weight:800;font-size:11px}
+
+/* SETTINGS */
+.settings-section{margin-bottom:20px}
+.settings-section h3{font-size:13px;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #eef2ed}
+
+/* BODY JOURNAL */
+.journal-entry{padding:12px 14px;background:var(--offwhite);border-radius:var(--radius-lg);margin-bottom:8px;border-left:3px solid var(--lav)}
+.journal-entry-date{font-size:11px;color:var(--text-soft);font-weight:700;margin-bottom:4px}
+.journal-entry-text{font-size:13px;line-height:1.5;color:var(--text)}
+
+/* WEIGHT */
+.weight-entry{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed #e8f0e5;font-size:13px}
+.weight-val{font-family:var(--font-disp);font-size:18px;color:var(--sky-dark)}
+
+/* BOTTOM SHEETS & MODALS */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.sheet-overlay.open{opacity:1;pointer-events:all}
+.sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;background:var(--white);border-radius:28px 28px 0 0;padding:20px 20px 44px;z-index:501;transition:transform .35s cubic-bezier(.34,1.1,.64,1);box-shadow:var(--shadow-modal);max-height:90dvh;overflow-y:auto}
+.sheet.open{transform:translateX(-50%) translateY(0)}
+.sheet-handle{width:44px;height:5px;border-radius:3px;background:#e0e8dd;margin:0 auto 16px}
+.sheet-title{font-family:var(--font-disp);font-size:21px;text-align:center;margin-bottom:4px}
+.sheet-sub{font-size:13px;color:var(--text-soft);text-align:center;margin-bottom:18px;line-height:1.5}
+.sheet-cur{background:var(--offwhite);border-radius:var(--radius-lg);padding:11px 14px;margin-bottom:14px;border:1.5px solid #e8f0e5}
+.sheet-cur-lbl{font-size:9px;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.sheet-choices,.modal-choices{display:flex;flex-direction:column;gap:9px}
+.sheet-choice,.modal-choice{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-radius:var(--radius-xl);border:2.5px solid transparent;cursor:pointer;transition:transform .15s;text-align:left;background:none;width:100%;font-family:var(--font-body)}
+.sheet-choice:active,.modal-choice:active{transform:scale(.97)}
+.choice-up{background:var(--mint-soft);border-color:var(--mint)}
+.choice-stay{background:var(--rose-soft);border-color:var(--rose)}
+.choice-down{background:var(--yellow-soft);border-color:var(--yellow)}
+.pmc-adv{background:var(--mint-soft);border-color:var(--mint)}
+.pmc-stay{background:var(--yellow-soft);border-color:var(--yellow)}
+.pmc-back{background:var(--rose-soft);border-color:var(--rose)}
+.choice-icon{font-size:24px;flex-shrink:0;margin-top:1px}
+.choice-title{font-size:14px;font-weight:800;display:block;margin-bottom:2px;color:var(--mint-dark)}
+.choice-title-stay{color:var(--rose-dark)}
+.choice-title-down{color:#8a6e00}
+.choice-desc{font-size:12px;color:var(--text-soft);line-height:1.4}
+
+/* CELEBRATION */
+#celebrate{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(168,230,195,.92);z-index:700;opacity:0;pointer-events:none;transition:opacity .3s;text-align:center;padding:40px}
+#celebrate.show{opacity:1;pointer-events:all}
+.cel-icon{font-size:76px;display:block;animation:bigBounce .6s cubic-bezier(.34,1.56,.64,1)}
+#celebrate h2{font-family:var(--font-disp);font-size:26px;margin:14px 0 8px;color:#1a4a30}
+#celebrate p{font-size:14px;color:#2D5A3D;line-height:1.5;max-width:280px}
+
+/* TOAST */
+#toast{position:fixed;bottom:calc(var(--nav-h)+14px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--text);color:#fff;padding:11px 18px;border-radius:var(--radius-pill);font-size:13px;font-weight:700;opacity:0;transition:opacity .25s,transform .25s;z-index:800;white-space:nowrap;max-width:88vw;text-align:center;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.soft{background:var(--yellow-dark);color:#5c4200}
+#toast.celebrate{background:linear-gradient(90deg,var(--mint-dark),var(--rose-dark));color:#fff}
+
+/* BREATHING */
+.breathing-circle{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--mint) 0%,var(--mint-soft) 70%);margin:16px auto;display:flex;align-items:center;justify-content:center;font-family:var(--font-disp);font-size:13px;color:var(--mint-dark);animation:breathe 6s ease-in-out infinite}
+</style>
+</head>
+<body>
+
+<!-- CHECK-IN WIZARD -->
+<div id="checkin-overlay">
+  <div id="ci-step-dots" class="ci-step-indicator"></div>
+  <div id="ci-icon" class="ci-icon">🌸</div>
+  <h1 class="ci-title" id="ci-title">How are you today?</h1>
+  <p class="ci-sub" id="ci-sub">Only you know your body.</p>
+  <div id="ci-content" style="width:100%"></div>
+  <div class="ci-nav">
+    <button class="btn btn-ghost btn-sm" id="ci-back-btn">← Back</button>
+    <button class="btn btn-mint btn-sm" id="ci-next-btn">Next →</button>
+  </div>
+  <button class="ci-skip" id="ci-skip-btn">Skip this for now</button>
+</div>
+
+<div id="app">
+
+<!-- ══ HOME ══ -->
+<section id="screen-home" class="screen active">
+  <div class="home-header">
+    <span class="home-app-icon">🌸</span>
+    <h1>Re:Cover</h1>
+    <p style="color:var(--text-soft);font-size:13px;margin-top:3px">Your companion for the comeback ✨</p>
+  </div>
+  <div id="mode-tag-container" style="text-align:center;margin-bottom:14px"></div>
+  <div id="recovery-banner" style="display:none" class="card card-rose">
+    <div class="card-header"><span class="card-icon">💆‍♀️</span><h2>Recovery Mode On</h2></div>
+    <p style="font-size:13px;color:var(--text-soft)">Rest <em>is</em> the medicine today. 🌿</p>
+    <div class="breathing-circle" id="breathe-label">Breathe<br/>in...</div>
+  </div>
+  <div class="affirmation-card"><p id="affirmation-text">Loading your encouragement...</p></div>
+
+  <!-- Today's snapshot -->
+  <div class="card">
+    <div class="card-header" style="margin-bottom:10px"><span class="card-icon">📋</span><h2 id="home-today-label">Today</h2></div>
+    <div id="day-summary-strip" class="day-summary"></div>
+  </div>
+
+  <!-- Phase card -->
+  <div class="card card-lav" id="home-phase-card">
+    <div class="card-header" style="margin-bottom:8px"><span class="card-icon" id="home-phase-icon">🗺️</span><h2 id="home-phase-name">Your Journey</h2></div>
+    <p id="home-phase-hint" style="font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.4"></p>
+    <div class="progress-track"><div class="progress-fill prog-lav" id="home-phase-prog" style="width:0%"></div></div>
+    <p id="home-phase-sub" style="font-size:11px;color:var(--text-soft);margin-top:5px;text-align:right"></p>
+  </div>
+
+  <div class="quick-stats">
+    <div class="stat-card"><div class="stat-val" id="stat-water">0</div><div class="stat-label">💧 Glasses</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-walk">0</div><div class="stat-label">🚶 Walk mins</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fatigue">–</div><div class="stat-label">😴 Fatigue</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-protein">0/6</div><div class="stat-label">💪 Protein</div></div>
+  </div>
+
+  <button class="btn btn-mint btn-full" id="retake-checkin-btn" style="margin-bottom:14px">✦ Do my daily check-in</button>
+</section>
+
+<!-- ══ MOVES ══ -->
+<section id="screen-moves" class="screen">
+  <div class="sec-head"><h2>💪 Your Moves</h2><span class="badge badge-mint" id="moves-mode-badge">Full</span></div>
+  <div id="recovery-moves" style="display:none">
+    <div class="card card-rose">
+      <div class="card-header"><span class="card-icon">🛌</span><h2>Rest is Productive</h2></div>
+      <p style="font-size:13px;color:var(--text-soft)">Your cells are rebuilding even as you rest. Sleep and stillness are medicine. 💊</p>
+      <div class="breathing-circle" style="width:95px;height:95px;font-size:12px">Inhale<br/>4 sec</div>
+      <div class="anti-guilt">Body said 'No' today? That's a win for rest! 🌙</div>
+    </div>
+  </div>
+  <div id="full-moves">
+    <h3 style="margin-bottom:9px;color:var(--mint-dark)">🦾 Lymphedema Prevention</h3>
+    <div id="lymph-exercises"></div>
+    <h3 style="margin:14px 0 9px;color:var(--rose-dark)">🌅 Mobility &amp; Stretching</h3>
+    <div id="mobility-exercises"></div>
+    <h3 style="margin:14px 0 9px;color:var(--lav-dark)">💪 Strength &amp; Conditioning</h3>
+    <div id="strength-exercises"></div>
+    <h3 style="margin:14px 0 9px">🚶 Cardio</h3>
+    <div id="cardio-exercises"></div>
+    <h3 style="margin:14px 0 9px">⏱ Walk Tracker</h3>
+    <div class="card">
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px">How many minutes did you move today?</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="number" id="walk-input" placeholder="e.g. 20" min="0" max="300" style="text-align:center;font-size:18px"/>
+        <button class="btn btn-mint btn-sm" id="walk-save">Log</button>
+      </div>
+      <div id="walk-guilt" class="anti-guilt" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FUEL ══ -->
+<section id="screen-fuel" class="screen">
+  <div class="sec-head"><h2>🥗 Your Fuel</h2></div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div><strong style="font-size:14px">😔 Nausea / Bland Mode</strong><p style="font-size:11px;color:var(--text-soft);margin-top:2px">Hides complex food options</p></div>
+      <label class="toggle"><input type="checkbox" id="bland-toggle"/><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+  <div id="bland-mode" style="display:none">
+    <div class="card card-yellow">
+      <div class="card-header"><span class="card-icon">🍞</span><h2>Gentle Eats</h2></div>
+      <ul class="check-list" id="bland-list">
+        <li data-id="toast"><span class="check-box"></span>🍞 Toast</li>
+        <li data-id="broth"><span class="check-box"></span>🍵 Clear Broth</li>
+        <li data-id="oats"><span class="check-box"></span>🥣 Oats</li>
+        <li data-id="banana"><span class="check-box"></span>🍌 Banana</li>
+        <li data-id="cracker"><span class="check-box"></span>🫙 Plain Crackers</li>
+      </ul>
+      <div class="anti-guilt">Eating anything at all today? Total win. 💛</div>
+    </div>
+  </div>
+  <div id="normal-fuel">
+    <div class="card card-mint">
+      <div class="card-header"><span class="card-icon">💧</span><h2>Hydration Tracker</h2></div>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:3px">Each 💧 = one 250ml glass (1 cup). Goal: 8 glasses = 2 litres.</p>
+      <p style="font-size:11px;color:var(--mint-dark);font-weight:700;margin-bottom:9px">Flushing chemo byproducts helps your ALT levels! 🫀</p>
+      <div class="droplet-grid" id="droplets"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:9px">
+        <div>
+          <span style="font-family:var(--font-disp);font-size:20px;color:var(--mint-dark)" id="water-ml">0 <small style="font-size:12px;font-family:var(--font-body);color:var(--text-soft);font-weight:700">ml</small></span>
+          <div style="font-size:10px;color:var(--text-soft);font-weight:700;margin-top:1px">of 2,000ml goal</div>
+        </div>
+        <div id="water-msg" style="font-size:12px;color:var(--mint-dark);font-weight:700;text-align:right;padding-left:8px;line-height:1.4;flex:1"></div>
+      </div>
+      <div id="water-cel" class="anti-guilt" style="display:none;border-color:var(--mint-dark);color:#1a4a30;background:var(--mint-soft)"></div>
+    </div>
+
+    <div class="card card-rose">
+      <div class="card-header"><span class="card-icon">💪</span><h2>Protein Hits</h2></div>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:8px">Building blocks for your healing body. Aim for 3–4 a day. ✨</p>
+      <ul class="check-list" id="protein-list">
+        <li data-id="yogurt"><span class="check-box"></span>🥛 Greek Yogurt <span style="font-size:11px;color:var(--text-soft);margin-left:auto">~15g</span></li>
+        <li data-id="beans"><span class="check-box"></span>🫘 Beans / Lentils <span style="font-size:11px;color:var(--text-soft);margin-left:auto">~9g</span></li>
+        <li data-id="fish"><span class="check-box"></span>🐟 Fish <span style="font-size:11px;color:var(--text-soft);margin-left:auto">~25g</span></li>
+        <li data-id="tofu"><span class="check-box"></span>🧆 Tofu <span style="font-size:11px;color:var(--text-soft);margin-left:auto">~10g</span></li>
+        <li data-id="eggs"><span class="check-box"></span>🥚 Eggs <span style="font-size:11px;color:var(--text-soft);margin-left:auto">~12g</span></li>
+        <li data-id="nuts"><span class="check-box"></span>🥜 Nuts / Seeds <span style="font-size:11px;color:var(--text-soft);margin-left:auto">~7g</span></li>
+      </ul>
+      <div style="margin-top:10px">
+        <div class="progress-track"><div class="progress-fill prog-rose" id="protein-prog" style="width:0%"></div></div>
+        <div id="protein-milestone" style="text-align:center;font-size:12px;font-weight:800;color:var(--rose-dark);margin-top:7px;min-height:18px"></div>
+      </div>
+      <div id="protein-guilt" class="anti-guilt" style="display:none">Nourishing yourself is enough. Every bite counts. 💕</div>
+    </div>
+
+    <!-- Drain log (settings-gated) -->
+    <div id="drain-module" style="display:none">
+      <div class="card card-sky">
+        <div class="card-header"><span class="card-icon">🧴</span><h2>Drain Log</h2></div>
+        <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px">Log drain output twice daily. Drains come out when &lt;30ml/day for 2 consecutive days.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div><label style="font-size:11px;font-weight:800;color:var(--text-soft)">LEFT drain (ml)</label><input type="number" id="drain-left" placeholder="ml" min="0" max="500" style="margin-top:4px;border-color:var(--sky)"/></div>
+          <div><label style="font-size:11px;font-weight:800;color:var(--text-soft)">RIGHT drain (ml)</label><input type="number" id="drain-right" placeholder="ml" min="0" max="500" style="margin-top:4px;border-color:var(--sky)"/></div>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:11px;font-weight:800;color:var(--text-soft);display:block;margin-bottom:4px">Fluid colour</label>
+          <select id="drain-colour" style="border-color:var(--sky)">
+            <option value="">— select colour —</option>
+            <option value="red">🔴 Red / Bright blood</option>
+            <option value="pink">🩷 Pink / Old blood</option>
+            <option value="yellow">🟡 Yellow / Serosanguineous</option>
+            <option value="clear">⚪ Clear / Straw coloured</option>
+          </select>
+        </div>
+        <button class="btn btn-sm" style="background:var(--sky-dark);color:#fff;width:100%" id="drain-save">Log Drain Output</button>
+        <div id="drain-log-list" style="margin-top:12px"></div>
+        <div class="anti-guilt" style="margin-top:8px;border-color:var(--sky-dark);color:#1a3d52;background:var(--sky-soft)">Screenshot this before your plastic surgeon appointment. They'll love the detail! 📋</div>
+      </div>
+    </div>
+
+    <!-- Weight tracker (settings-gated) -->
+    <div id="weight-module" style="display:none">
+      <div class="card card-sky">
+        <div class="card-header"><span class="card-icon">⚖️</span><h2>Weekly Weight</h2></div>
+        <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px">Log once a week — not daily. Trends matter more than numbers.</p>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="weight-input" placeholder="kg" min="30" max="200" step="0.1" style="border-color:var(--sky)"/>
+          <button class="btn btn-sm" style="background:var(--sky-dark);color:#fff;white-space:nowrap" id="weight-save">Log</button>
+        </div>
+        <div id="weight-list" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <!-- Medication log (settings-gated) -->
+    <div id="med-module" style="display:none">
+      <div class="card card-peach">
+        <div class="card-header"><span class="card-icon">💊</span><h2>Medication Log</h2></div>
+        <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px">Track meds including anti-nausea. Useful for your oncologist — especially if a med isn't working!</p>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:8px">
+          <input type="text" id="med-name" placeholder="Medication name" style="border-color:var(--peach)"/>
+          <input type="text" id="med-dose" placeholder="Dose" style="border-color:var(--peach);width:80px"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center">
+          <select id="med-effectiveness" style="border-color:var(--peach)">
+            <option value="">Effectiveness (optional)</option>
+            <option value="worked-well">✅ Worked well</option>
+            <option value="partial">🟡 Partial relief</option>
+            <option value="no-effect">❌ No effect</option>
+            <option value="side-effects">⚠️ Side effects</option>
+          </select>
+          <button class="btn btn-peach btn-sm" id="med-save">Log</button>
+        </div>
+        <div id="med-list" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ LOGS ══ -->
+<section id="screen-logs" class="screen">
+  <div class="sec-head"><h2>📊 Your Logs</h2></div>
+
+  <!-- ══ DOCTOR NOTES ══ -->
+  <div class="card card-yellow">
+    <div class="card-header"><span class="card-icon">🩺</span><h2>Notes for My Doctor</h2></div>
+    <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.5">Jot down anything you want to tell or ask your doctor. Saved with today's date and organised automatically.</p>
+    <textarea id="doc-note-input" rows="3" placeholder="e.g. The nausea was really bad on Tuesday, the anti-nausea meds didn't help much…" style="border-color:var(--yellow-dark);margin-bottom:8px"></textarea>
+    <button class="btn btn-yellow btn-sm btn-full" id="doc-note-save">💾 Save note</button>
+  </div>
+
+  <!-- ══ APPOINTMENT VIEW ══ -->
+  <div class="card" style="border:2px solid var(--mint)">
+    <div class="card-header"><span class="card-icon">📋</span><h2>My Appointment Notes</h2></div>
+    <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.5">Tick each one off as you raise it with your doctor. Ticked notes move to the archive automatically.</p>
+
+    <!-- Active notes grouped by date -->
+    <div id="doc-notes-active">
+      <p id="doc-notes-empty" style="font-size:13px;color:var(--text-soft);text-align:center;padding:12px 0">No notes yet — add one above before your next appointment!</p>
+    </div>
+
+    <!-- Archive toggle -->
+    <div id="doc-archive-wrap" style="display:none;margin-top:14px;border-top:1.5px dashed #e8f0e5;padding-top:12px">
+      <button id="doc-archive-toggle" style="background:none;border:none;font-size:12px;font-weight:800;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;gap:6px;padding:0">
+        <span id="doc-archive-chevron">▶</span> Show archived notes (<span id="doc-archive-count">0</span>)
+      </button>
+      <div id="doc-notes-archive" style="display:none;margin-top:10px"></div>
+    </div>
+  </div>
+
+  <!-- ══ TREND REPORT ══ -->
+  <div class="card">
+    <div class="card-header"><span class="card-icon">📈</span><h2>Trend Report</h2></div>
+    <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.5">All your tracked metrics on one chart — perfect to screenshot for your oncologist.</p>
+
+    <!-- Period toggle -->
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="period-btn active" data-period="week">7 days</button>
+      <button class="period-btn" data-period="month">30 days</button>
+      <button class="period-btn" data-period="3month">3 months</button>
+    </div>
+
+    <!-- Metric toggles -->
+    <div id="metric-toggles" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+
+    <!-- Chart -->
+    <canvas id="trend-chart" style="width:100%;border-radius:var(--radius-lg);background:var(--white);border:1.5px solid #eef2ed"></canvas>
+    <div id="trend-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
+  </div>
+
+  <!-- ══ CALENDAR (settings-gated) ══ -->
+  <div id="calendar-module" style="display:none">
+    <div class="card">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" id="cal-prev">‹</button>
+        <h3 id="cal-month-label">Month</h3>
+        <button class="cal-nav-btn" id="cal-next">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--text-soft)">Colour = fatigue:</span>
+        <span style="font-size:11px;display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#c8f0da;display:inline-block"></span>Low</span>
+        <span style="font-size:11px;display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#ffe8a0;display:inline-block"></span>Moderate</span>
+        <span style="font-size:11px;display:inline-flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:#fcc8d4;display:inline-block"></span>High</span>
+      </div>
+      <div id="day-detail" style="background:var(--offwhite);border-radius:var(--radius-lg);padding:14px;display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-family:var(--font-disp);font-size:16px" id="dd-date-label"></span>
+          <button class="dd-edit-btn" id="dd-edit-btn">Edit</button>
+        </div>
+        <div class="dd-metrics" id="dd-metrics"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ JOURNEY PHASES ══ -->
+  <div class="card card-lav">
+    <div class="card-header"><span class="card-icon">🗺️</span><h2>Recovery Journey</h2></div>
+    <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.4">Your pace. No timelines. Setbacks are part of the story, not failure.</p>
+    <div class="phase-track" id="phase-track"></div>
+    <div style="background:var(--yellow-soft);border:2px solid var(--yellow);border-radius:var(--radius-lg);padding:11px 13px;margin-top:8px">
+      <h3 id="phase-dtitle" style="margin-bottom:4px;font-size:13px"></h3>
+      <p id="phase-ddesc" style="font-size:12px;color:var(--text-soft);margin-bottom:10px"></p>
+      <button class="btn btn-lav btn-sm" id="phase-advance-btn">✦ How am I doing in this phase?</button>
+    </div>
+  </div>
+
+  <!-- ══ ALT ══ -->
+  <div class="card card-rose">
+    <div class="card-header"><span class="card-icon">🩸</span><h2>ALT / Blood Results</h2></div>
+    <p style="font-size:12px;color:var(--text-soft);margin-bottom:2px">Log your ALT levels. The dashed line is the normal upper limit (40 U/L).</p>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input type="number" id="alt-input" placeholder="ALT value (U/L)" min="0" max="999" style="border-color:var(--rose)"/>
+      <button class="btn btn-rose btn-sm" id="alt-save">Log</button>
+    </div>
+    <canvas id="alt-chart"></canvas>
+    <div id="alt-log-list" style="margin-top:10px"></div>
+    <div class="anti-guilt" style="margin-top:8px">Numbers are data, not grades. You are doing amazingly. 📈</div>
+  </div>
+
+  <!-- ══ BODY JOURNAL (settings-gated) ══ -->
+  <div id="journal-module" style="display:none">
+    <div class="card card-lav">
+      <div class="card-header"><span class="card-icon">💜</span><h2>My Body Journal</h2></div>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px;line-height:1.4">A private space for how you are feeling about your body, your reconstruction, your identity. Not tracked. Not judged. Just held. 💕</p>
+      <textarea id="journal-input" rows="3" placeholder="How are you feeling today about your body and your journey?" style="border-color:var(--lav);margin-bottom:8px"></textarea>
+      <button class="btn btn-lav btn-sm" id="journal-save">Save this moment</button>
+      <div id="journal-list" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ SETTINGS ══ -->
+<section id="screen-settings" class="screen">
+  <div class="home-header" style="padding-bottom:12px">
+    <span style="font-size:40px;display:block;margin-bottom:6px">⚙️</span>
+    <h1>Settings</h1>
+    <p style="color:var(--text-soft);font-size:13px;margin-top:3px">Customise Re:Cover to your journey</p>
+  </div>
+
+  <div class="card">
+    <div class="settings-section">
+      <h3>Daily Check-in Steps</h3>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.4">Choose which questions appear in your daily check-in. Turn off anything that doesn't apply to you right now.</p>
+      <div id="settings-checkin-toggles"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="settings-section">
+      <h3>Tracking Modules</h3>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px;line-height:1.4">Show or hide entire sections of the app.</p>
+      <div id="settings-module-toggles"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="settings-section">
+      <h3>Your Name</h3>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:10px">Personalise the app's greetings.</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="settings-name" placeholder="Your first name" maxlength="30"/>
+        <button class="btn btn-mint btn-sm" id="settings-name-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="settings-section" style="margin-bottom:0">
+      <h3>Data</h3>
+      <p style="font-size:12px;color:var(--text-soft);margin-bottom:12px">All your data is stored locally on this device only — never sent anywhere.</p>
+      <button class="btn btn-danger btn-sm" id="clear-data-btn">🗑 Clear all data</button>
+    </div>
+  </div>
+</section>
+
+<!-- NAV -->
+</div><!-- end #app -->
+<nav id="bottom-nav">
+  <button class="nav-btn active" data-screen="home"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+  <button class="nav-btn" data-screen="moves"><span class="nav-icon">💪</span><span class="nav-label">Moves</span></button>
+  <button class="nav-btn" data-screen="fuel"><span class="nav-icon">🥗</span><span class="nav-label">Fuel</span></button>
+  <button class="nav-btn" data-screen="logs"><span class="nav-icon">📊</span><span class="nav-label">Logs</span></button>
+  <button class="nav-btn" data-screen="settings"><span class="nav-icon">⚙️</span><span class="nav-label">Settings</span></button>
+</nav>
+
+<!-- LEVEL SHEET -->
+<div class="sheet-overlay" id="level-overlay"></div>
+<div class="sheet" id="level-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="level-sheet-title">How's this feeling?</div>
+  <p class="sheet-sub">Only you know your body. Zero judgment.</p>
+  <div class="sheet-cur"><div class="sheet-cur-lbl">Currently doing</div><div id="level-cur-name" style="font-size:14px;font-weight:800"></div><div id="level-cur-desc" style="font-size:12px;color:var(--text-soft);margin-top:3px"></div></div>
+  <div class="sheet-choices" id="level-choices"></div>
+</div>
+
+<!-- PHASE MODAL -->
+<div class="sheet-overlay" id="phase-overlay"></div>
+<div class="sheet" id="phase-sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="phase-sheet-title">How's this phase going?</div>
+  <p class="sheet-sub">Your journey, your pace. Both directions are valid.</p>
+  <div class="modal-choices" id="phase-choices"></div>
+</div>
+
+<!-- EDIT DAY MODAL -->
+<div id="edit-modal-overlay" class="sheet-overlay"><div id="edit-modal">
+  <div class="sheet-handle"></div>
+  <h2 style="font-family:var(--font-disp);margin-bottom:4px">Edit Day</h2>
+  <p id="edit-modal-date" style="font-size:13px;color:var(--text-soft);margin-bottom:16px"></p>
+  <div id="edit-fields"></div>
+  <div style="display:flex;gap:10px;margin-top:16px">
+    <button class="btn btn-ghost btn-sm" id="edit-cancel">Cancel</button>
+    <button class="btn btn-mint btn-sm" id="edit-save" style="flex:1">Save Changes</button>
+  </div>
+</div></div>
+
+<!-- CELEBRATION -->
+<div id="celebrate"><span class="cel-icon" id="cel-icon">🎉</span><h2 id="cel-title">Yes!</h2><p id="cel-msg"></p></div>
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  RE:COVER v4 — The Full Build
+//  localStorage-only, date-aware, settings-gated
+// ═══════════════════════════════════════════════
+
+// ── UTILS ──
+const $ = id => document.getElementById(id);
+const store = {
+  get:(k,f=null)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):f}catch{return f}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+// ── DATE HELPERS ──
+// ISO date key: "2025-08-14"
+const toISO = d => {
+  const dd = d || new Date();
+  return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`;
+};
+const todayISO = toISO();
+const todayDisplay = new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
+const todayFmt = new Date().toLocaleDateString('en-AU',{day:'2-digit',month:'short'});
+const formatISO = iso => {
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+};
+const formatISOShort = iso => {
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]}`;
+};
+
+// ── SETTINGS SCHEMA ──
+// All check-in steps and modules default OFF except core ones
+const SETTINGS_DEFAULTS = {
+  // Check-in steps
+  ci_fatigue:    true,   // always on
+  ci_pain:       true,
+  ci_nausea:     true,
+  ci_mood:       true,
+  ci_sleep:      true,
+  ci_bowel:      false,
+  ci_neuro:      false,
+  // Modules
+  mod_drain:     false,  // OFF by default — drains often removed
+  mod_weight:    true,
+  mod_meds:      false,
+  mod_journal:   true,
+  mod_calendar:  false,  // Calendar hidden by default
+};
+
+let settings = store.get('rc_settings', {...SETTINGS_DEFAULTS});
+
+function saveSetting(key, val) {
+  settings[key] = val;
+  store.set('rc_settings', settings);
+}
+
+// ── DAILY DATA store ──
+// All daily data lives under dayData[isoDate] = { fatigue, pain, nausea, mood, sleep, bowel, neuro, water, walkMins, proteins, blandItems, flags[] }
+let dayData = store.get('rc_day_data', {});
+// Long-term logs (not daily-reset)
+let altLogs    = store.get('rc_alt_logs', []);
+let drainLogs  = store.get('rc_drain_logs', []);
+let weightLogs = store.get('rc_weight_logs', []);
+let medLogs    = store.get('rc_med_logs', []);
+let journalEntries = store.get('rc_journal', []);
+let phase      = store.get('rc_phase', 0);
+let exLevels   = store.get('rc_ex_levels', {});
+let userName   = store.get('rc_name', '');
+let bland      = store.get('rc_bland', false);
+
+function saveAll() {
+  store.set('rc_day_data', dayData);
+  store.set('rc_alt_logs', altLogs);
+  store.set('rc_drain_logs', drainLogs);
+  store.set('rc_weight_logs', weightLogs);
+  store.set('rc_med_logs', medLogs);
+  store.set('rc_journal', journalEntries);
+  store.set('rc_phase', phase);
+  store.set('rc_ex_levels', exLevels);
+  store.set('rc_name', userName);
+  store.set('rc_bland', bland);
+}
+
+// Helper to get today's data object (creates if missing)
+function getDay(iso) {
+  if (!dayData[iso]) {
+    dayData[iso] = {fatigue:null,pain:null,nausea:null,mood:null,sleep:null,bowel:null,neuro:null,water:0,walkMins:0,proteins:{},blandItems:{}};
+  }
+  return dayData[iso];
+}
+function today() { return getDay(todayISO); }
+
+// ── AFFIRMATIONS ──
+const AFFIRMATIONS = [
+  "Every single day you wake up is a victory lap. 🏆",
+  "You're not just surviving — you're rewriting the story. ✍️",
+  "Your body is extraordinary. It heals even while you rest. 🌿",
+  "Scars are your body's love letters to its own survival. 💌",
+  "You've got this. And on the days you don't — you've got rest. 💤",
+  "Progress isn't always visible. But it's always happening. 🌱",
+  "Strength isn't just lifting things. It's enduring softly. 🕊️",
+  "You are more than your labs, your numbers, your plan. 💖",
+  "Rest is not giving in. Rest is fighting smarter. 🧠",
+  "Your comeback is going to be legendary. 🌟",
+  "Today you showed up. That's everything. 🙌",
+  "Your liver is working hard so you can play later. Thank it! 💛",
+];
+
+// ── TOAST ──
+function toast(msg, type='', dur=2800) {
+  const t=$('toast'); t.textContent=msg; t.className=type; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ── CELEBRATION ──
+function celebrate(icon, title, msg) {
+  $('cel-icon').textContent=icon; $('cel-title').textContent=title; $('cel-msg').textContent=msg;
+  $('celebrate').classList.add('show');
+  setTimeout(()=>$('celebrate').classList.remove('show'), 3500);
+}
+$('celebrate').addEventListener('click',()=>$('celebrate').classList.remove('show'));
+
+// ── BREATHING ──
+let breathIdx=0;
+const BREATH=['Breathe\nin...','Hold...','Breathe\nout...','Rest...'];
+setInterval(()=>{
+  breathIdx=(breathIdx+1)%BREATH.length;
+  const el=$('breathe-label'); if(el) el.innerHTML=BREATH[breathIdx];
+},1500);
+
+// ── NAV ──
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const t=btn.dataset.screen;
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    $('screen-'+t).classList.add('active');
+    if(t==='logs'){buildPhaseTrack();renderALTChart();renderALTList();renderDocNotes();renderTrendChart();if(settings.mod_calendar)buildCalendar();renderJournal();}
+    if(t==='fuel'){renderDrainList();renderWeightList();renderMedList();}
+    if(t==='settings'){renderSettings();}
+    if(t==='home'){renderHome();}
+  });
+});
+
+// ═══════════════════════════════════════
+//  CHECK-IN WIZARD
+// ═══════════════════════════════════════
+
+const CI_STEPS = [
+  {key:'fatigue', settingKey:'ci_fatigue', always:true,
+   icon:'😴', title:'How are you feeling?', sub:'Your energy level right now, honestly.',
+   type:'scale10',
+   emojis:['🏃','😊','🙂','😌','🤔','😐','😑','😩','😵','💀'],
+   labels:['1','2','3','4','5','6','7','8','9','10'],
+   selClass:['sel-mint','sel-mint','sel-mint','sel-mint','sel-yellow','sel-yellow','sel-yellow','sel-rose','sel-rose','sel-rose']
+  },
+  {key:'pain', settingKey:'ci_pain',
+   icon:'🤕', title:'Any pain today?', sub:'Rate your discomfort level (0 = none).',
+   type:'scale6',
+   emojis:['😌','🙂','😐','😟','😣','😭'],
+   labels:['None','Mild','Moderate','Uncomfortable','Bad','Severe'],
+   selClass:['sel-mint','sel-mint','sel-yellow','sel-yellow','sel-rose','sel-rose']
+  },
+  {key:'nausea', settingKey:'ci_nausea',
+   icon:'🤢', title:'Any nausea today?', sub:'0 = none, 5 = vomiting.',
+   type:'scale6',
+   emojis:['😊','🙂','😐','🤢','🤮','😵'],
+   labels:['None','Mild','Moderate','Bad','Vomiting','Very sick'],
+   selClass:['sel-mint','sel-mint','sel-yellow','sel-yellow','sel-rose','sel-rose']
+  },
+  {key:'mood', settingKey:'ci_mood',
+   icon:'💜', title:'How\'s your mood?', sub:'Your emotional state right now.',
+   type:'scale5',
+   emojis:['😢','😕','😐','🙂','😄'],
+   labels:['Struggling','Low','Okay','Good','Great'],
+   selClass:['sel-rose','sel-rose','sel-yellow','sel-mint','sel-mint']
+  },
+  {key:'sleep', settingKey:'ci_sleep',
+   icon:'🌙', title:'How did you sleep?', sub:'Rate last night\'s sleep quality.',
+   type:'scale5',
+   emojis:['😤','😩','😐','🛌','✨'],
+   labels:['Terrible','Poor','Okay','Good','Great'],
+   selClass:['sel-rose','sel-rose','sel-yellow','sel-mint','sel-mint']
+  },
+  {key:'bowel', settingKey:'ci_bowel',
+   icon:'🌿', title:'Bowel check', sub:'Important during chemo — constipation and diarrhea are common side effects.',
+   type:'scale5',
+   emojis:['😰','😟','😊','💨','🚽'],
+   labels:['No movement','Constipated','Normal','Loose','Diarrhea'],
+   selClass:['sel-rose','sel-yellow','sel-mint','sel-yellow','sel-rose']
+  },
+  {key:'neuro', settingKey:'ci_neuro',
+   icon:'✋', title:'Tingling or numbness?', sub:'Peripheral neuropathy in hands or feet. Tell your oncologist if this is increasing — it affects dosage decisions.',
+   type:'scale4',
+   emojis:['😊','🤏','😟','😰'],
+   labels:['None','Mild tingle','Moderate','Significant'],
+   selClass:['sel-mint','sel-yellow','sel-rose','sel-rose']
+  },
+];
+
+let ciSteps = [];
+let ciCurrent = 0;
+let ciAnswers = {};
+let ciEditDate = null; // null = today, else ISO string
+
+function getActiveSteps() {
+  return CI_STEPS.filter(s => s.always || settings[s.settingKey]);
+}
+
+function openCheckin(editDate=null) {
+  ciEditDate = editDate;
+  ciSteps = getActiveSteps();
+  ciCurrent = 0;
+  ciAnswers = {};
+  // Pre-fill if editing
+  if (editDate) {
+    const d = getDay(editDate);
+    ciSteps.forEach(s => { if(d[s.key]!==null&&d[s.key]!==undefined) ciAnswers[s.key]=d[s.key]; });
+  }
+  renderCIStep();
+  $('checkin-overlay').classList.add('open');
+}
+
+function closeCICheckin() {
+  $('checkin-overlay').classList.remove('open');
+  ciEditDate = null;
+}
+
+function renderCIStep() {
+  const step = ciSteps[ciCurrent];
+  // Dots
+  const dots = $('ci-step-dots');
+  dots.innerHTML = ciSteps.map((_,i)=>
+    `<span class="ci-dot${i<ciCurrent?' done':i===ciCurrent?' active':''}"></span>`).join('');
+  $('ci-icon').textContent = step.icon;
+  $('ci-title').textContent = step.title;
+  $('ci-sub').textContent = step.sub;
+
+  // Build scale
+  const cols = step.type==='scale10'?5 : step.type==='scale6'?3 : step.type==='scale5'?5 : 4;
+  const count = step.emojis.length;
+  const content = $('ci-content');
+  content.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'scale-grid';
+  grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  step.emojis.forEach((emoji,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'scale-btn';
+    const sel = ciAnswers[step.key]===i;
+    if(sel) btn.classList.add('sel', step.selClass[i]||'sel-mint');
+    btn.innerHTML = `<span>${emoji}</span><span class="lb">${step.labels[i]}</span>`;
+    btn.addEventListener('click',()=>{
+      ciAnswers[step.key]=i;
+      grid.querySelectorAll('.scale-btn').forEach((b,bi)=>{
+        b.classList.remove('sel','sel-mint','sel-rose','sel-yellow','sel-lav');
+      });
+      btn.classList.add('sel', step.selClass[i]||'sel-mint');
+    });
+    grid.appendChild(btn);
+  });
+  content.appendChild(grid);
+
+
+  // Back / Next
+  $('ci-back-btn').style.display = ciCurrent===0 ? 'none' : '';
+  $('ci-next-btn').textContent = ciCurrent===ciSteps.length-1 ? 'Done ✓' : 'Next →';
+}
+
+$('ci-next-btn').addEventListener('click',()=>{
+  if(ciCurrent===ciSteps.length-1){
+    saveCIAnswers(); closeCICheckin();
+  } else {
+    ciCurrent++; renderCIStep();
+  }
+});
+$('ci-back-btn').addEventListener('click',()=>{ if(ciCurrent>0){ciCurrent--;renderCIStep();}});
+$('ci-skip-btn').addEventListener('click',()=>{
+  ciCurrent++; if(ciCurrent>=ciSteps.length){saveCIAnswers();closeCICheckin();}else{renderCIStep();}
+});
+
+function saveCIAnswers() {
+  const targetDate = ciEditDate || todayISO;
+  const d = getDay(targetDate);
+  Object.assign(d, ciAnswers);
+  saveAll();
+  renderHome();
+  renderDaySummary();
+  toast('✓ Check-in saved!','celebrate');
+}
+
+$('retake-checkin-btn').addEventListener('click',()=>openCheckin());
+
+// ── AUTO OPEN check-in if not done today ──
+function maybeOpenCheckin() {
+  const d = getDay(todayISO);
+  if (d.fatigue===null) openCheckin();
+}
+
+// ═══════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════
+function renderHome() {
+  const d = today();
+  const f = d.fatigue;
+  const mt=$('mode-tag-container');
+  const rb=$('recovery-banner');
+  const greeting = userName ? `Hey ${userName}!` : 'Hey beautiful! 👋';
+
+  if(f===null){mt.innerHTML=`<span class="mode-tag" style="background:#eee;color:var(--text-soft)">😶 No check-in yet</span>`;rb.style.display='none';}
+  else if(f>=7){mt.innerHTML=`<span class="mode-tag mode-tag-recovery">💆‍♀️ Rest Mode · Fatigue ${f+1}/10</span>`;rb.style.display='block';}
+  else{mt.innerHTML=`<span class="mode-tag mode-tag-active">${f<=3?'⚡ Good Energy':'🌿 Gentle Mode'} · Fatigue ${f+1}/10</span>`;rb.style.display='none';}
+
+  $('affirmation-text').textContent=AFFIRMATIONS[new Date().getDate()%AFFIRMATIONS.length];
+  $('home-today-label').textContent=todayDisplay;
+
+  const ph=PHASES[phase];
+  $('home-phase-icon').textContent=ph.icon;
+  $('home-phase-name').textContent=ph.name+' Phase';
+  $('home-phase-hint').textContent=ph.exerciseHint;
+  $('home-phase-prog').style.width=Math.round((phase/(PHASES.length-1))*100)+'%';
+  $('home-phase-sub').textContent=`Phase ${phase+1} of ${PHASES.length}`;
+
+  $('stat-water').textContent=d.water||0;
+  $('stat-walk').textContent=d.walkMins||0;
+  $('stat-fatigue').textContent=f!==null?f+1:'–';
+  $('stat-protein').textContent=Object.values(d.proteins||{}).filter(Boolean).length+'/6';
+
+  renderDaySummary();
+}
+
+function renderDaySummary() {
+  const d = today();
+  const strip=$('day-summary-strip');
+  const items=[];
+  if(d.fatigue!==null) items.push({icon:'😴',label:'Fatigue',val:d.fatigue+1+'/10'});
+  if(d.pain!==null&&settings.ci_pain) items.push({icon:'🤕',label:'Pain',val:['None','Mild','Mod','Discomfort','Bad','Severe'][d.pain]});
+  if(d.nausea!==null&&settings.ci_nausea) items.push({icon:'🤢',label:'Nausea',val:['None','Mild','Mod','Bad','Vomiting','Very sick'][d.nausea]});
+  if(d.mood!==null&&settings.ci_mood) items.push({icon:'💜',label:'Mood',val:['Struggling','Low','Okay','Good','Great'][d.mood]});
+  if(d.sleep!==null&&settings.ci_sleep) items.push({icon:'🌙',label:'Sleep',val:['Terrible','Poor','Okay','Good','Great'][d.sleep]});
+  if(d.neuro!==null&&settings.ci_neuro) items.push({icon:'✋',label:'Neuro',val:['None','Mild','Moderate','Significant'][d.neuro]});
+  if(d.water) items.push({icon:'💧',label:'Water',val:d.water+'×250ml'});
+  strip.innerHTML = items.length===0
+    ? '<p style="font-size:12px;color:var(--text-soft)">Tap the check-in button above to log today\'s data.</p>'
+    : items.map(i=>`<span class="day-pill">${i.icon} <span class="dp-val">${i.val}</span></span>`).join('');
+}
+
+// ═══════════════════════════════════════
+//  MOVES
+// ═══════════════════════════════════════
+const PHASES = [
+  {id:'chemo',icon:'💊',name:'Chemo',shortName:'Chemo',
+   desc:'Every day you show up is a win. This phase lasts exactly as long as it needs to — no app can set that timeline.',
+   exerciseHint:'Focus on gentle lymphedema prevention and short walks. Rest is always valid.'},
+  {id:'transition',icon:'🌱',name:'Transition',shortName:'Transition',
+   desc:'Treatment is wrapping up. Your body is recalibrating. Start building gentle momentum — there is absolutely no rush.',
+   exerciseHint:'Mobility work and short walks. Strength will come.'},
+  {id:'radiation',icon:'⚡',name:'Radiation',shortName:'Radiation',
+   desc:'Fatigue and skin sensitivity are real here. Hydration and protein support your skin from the inside.',
+   exerciseHint:'Short frequent walks beat one long one. Keep up lymphedema prevention.'},
+  {id:'recovery',icon:'🌿',name:'Recovery',shortName:'Recovery',
+   desc:'You\'re building back. Strength and stamina trend upward. Some days will still be harder — that\'s normal.',
+   exerciseHint:'Strength training and longer cardio are on the table now. You lead.'},
+  {id:'thriving',icon:'🌟',name:'Thriving',shortName:'Thriving',
+   desc:'You made it through. Reclaiming your body, energy, and joy. No ceiling from here.',
+   exerciseHint:'All exercises unlocked. You decide what lights you up.'}
+];
+
+const CATS = {
+  lymph:{id:'lymph',label:'Lymphedema',ac:'var(--mint-dark)',as:'var(--mint-soft)',pc:'',lc:'',bc:'border:1.5px solid var(--mint);background:var(--mint-soft);color:var(--mint-dark)',
+    exercises:[
+      {icon:'👐',name:'Hand Pumps',levels:[
+        {label:'Gentle Start',desc:'5 slow open-close reps, once a day. Waking those fingers up! ⏱ 1 min',badge:'⏱ 1 min · Daily'},
+        {label:'Building',desc:'10 reps × 2 sets, morning and evening. Moving fluid keeps your arm happy! ⏱ 3 min',badge:'⏱ 3 min · 2×/day'},
+        {label:'Strong Flow',desc:'15 reps × 3 sets with wrist rotations. ⏱ 5 min',badge:'⏱ 5 min · 3×/day'},
+        {label:'Maintenance',desc:'12 reps × 2 sets, 3×/week. Long-term maintenance! ⏱ 3 min',badge:'⏱ 3 min · 3×/week'}]},
+      {icon:'🙌',name:'Arm Elevations',levels:[
+        {label:'Shoulder Height',desc:'Arms to shoulder height, hold 3 sec. 5 reps. Gravity is your lymph BFF! ⏱ 2 min',badge:'⏱ 2 min · Daily'},
+        {label:'Overhead',desc:'Raise arms overhead, hold 5 sec. 8–10 reps. ⏱ 3 min',badge:'⏱ 3 min · Daily'},
+        {label:'Full Pump',desc:'Overhead raises with squeezes at top. 12 reps × 2 sets. ⏱ 5 min',badge:'⏱ 5 min · 2×/day'},
+        {label:'Resistance',desc:'Light resistance band. 15 reps × 3. ⏱ 6 min',badge:'⏱ 6 min · Daily'}]}]},
+  mobility:{id:'mobility',label:'Mobility',ac:'var(--rose-dark)',as:'var(--rose-soft)',pc:'-rose',lc:'-rose',bc:'border:1.5px solid var(--rose);background:var(--rose-soft);color:var(--rose-dark)',
+    exercises:[
+      {icon:'🧱',name:'Wall Crawls',levels:[
+        {label:'Early Days',desc:'Fingers up wall as far as comfortable. 3 reps/side. Stop if it pulls. ⏱ 3 min',badge:'⏱ 3 min'},
+        {label:'Higher',desc:'Aim for eye level. 5 reps/side. Mark your max height! ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Full Reach',desc:'3-sec hold at top. 8 reps each side. ⏱ 7 min',badge:'⏱ 7 min'},
+        {label:'Behind Back',desc:'Opposite arm behind back. Challenges balance + mobility! ⏱ 8 min',badge:'⏱ 8 min'}]},
+      {icon:'🚪',name:'Chest Openers',levels:[
+        {label:'Soft',desc:'Forearms on doorframe, gentle lean. Hold 15 sec. 3 reps. ⏱ 2 min',badge:'⏱ 2 min'},
+        {label:'Deeper',desc:'Hold 25–30 sec. 4–5 reps. Breathe into it! ⏱ 4 min',badge:'⏱ 4 min'},
+        {label:'Full',desc:'40 sec with breath cycles. 5 reps, alternating heights. ⏱ 6 min',badge:'⏱ 6 min'},
+        {label:'Active',desc:'Dynamic opener with arm swings. 20 reps + holds. ⏱ 8 min',badge:'⏱ 8 min'}]},
+      {icon:'🔄',name:'Shoulder Rolls',levels:[
+        {label:'Gentle',desc:'5 slow forward rolls. Waking up those muscles! ⏱ 1 min',badge:'⏱ 1 min'},
+        {label:'Both Ways',desc:'10 forward + 10 back + 5 circles. ⏱ 3 min',badge:'⏱ 3 min'},
+        {label:'Full',desc:'15 each + neck tilts between sets. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Arm Circles',desc:'Wide circles forward and back, 20×3. ⏱ 6 min',badge:'⏱ 6 min'}]}]},
+  strength:{id:'strength',label:'Strength',ac:'var(--lav-dark)',as:'var(--lav-soft)',pc:'-lav',lc:'-lav',bc:'border:1.5px solid var(--lav);background:var(--lav-soft);color:var(--lav-dark)',
+    exercises:[
+      {icon:'🪑',name:'Lower Body',levels:[
+        {label:'Chair Work',desc:'Seated leg lifts and marching. 10 reps. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Stand & Sit',desc:'Slow sit-to-stand. 8 reps × 2. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Wall Sit',desc:'20–30 sec hold. 3 reps. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Squats',desc:'Free-standing squats, 12 × 3. ⏱ 8 min',badge:'⏱ 8 min'},
+        {label:'Weighted',desc:'Light dumbbells 2–4kg. 12 × 3. 🏋️ ⏱ 10 min',badge:'⏱ 10 min'}]},
+      {icon:'🤸',name:'Core & Stability',levels:[
+        {label:'Gentle',desc:'Seated belly breathing, pelvic tilts. ⏱ 4 min',badge:'⏱ 4 min'},
+        {label:'Balance',desc:'Single-leg stand (hold wall), 20 sec/side. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Knee Plank',desc:'20 sec hold. Build slowly. ⏱ 6 min',badge:'⏱ 6 min'},
+        {label:'Full Plank',desc:'30–40 sec × 3. ⏱ 8 min',badge:'⏱ 8 min'},
+        {label:'Dynamic',desc:'Plank shoulder taps + slow climbers. 3×10. 🔥 ⏱ 10 min',badge:'⏱ 10 min'}]}]},
+  cardio:{id:'cardio',label:'Cardio',ac:'var(--text)',as:'var(--offwhite)',pc:'',lc:'',bc:'border:1.5px solid #dde8da;background:var(--offwhite);color:var(--text-soft)',
+    exercises:[
+      {icon:'🚶',name:'Walking',levels:[
+        {label:'First Steps',desc:'5 min around the house. You showed up — that\'s everything. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Stroll',desc:'10–15 min outside, easy pace. ⏱ 15 min',badge:'⏱ 10–15 min'},
+        {label:'Confident',desc:'20–30 min steady. ⏱ 30 min',badge:'⏱ 20–30 min'},
+        {label:'Power Walk',desc:'30–45 min, varied terrain. 💪 ⏱ 45 min',badge:'⏱ 30–45 min'},
+        {label:'Intervals',desc:'3 min easy / 2 min brisk × 5. 🏃 ⏱ 25 min',badge:'⏱ 25 min'}]},
+      {icon:'🧘',name:'Mindful Movement',levels:[
+        {label:'Gentle Flow',desc:'Seated stretches: neck, arms, ankles. ⏱ 5 min',badge:'⏱ 5 min'},
+        {label:'Moving More',desc:'Modified sun salutation or kitchen dancing! ⏱ 10 min',badge:'⏱ 10 min'},
+        {label:'Beginner Yoga',desc:'Beginner yoga or Tai Chi video. ⏱ 20 min',badge:'⏱ 20 min'},
+        {label:'Full Practice',desc:'30 min yoga or pilates. 🧘 ⏱ 30 min',badge:'⏱ 30 min'},
+        {label:'Power Flow',desc:'Dynamic vinyasa. Stronger than before. 🌟 ⏱ 45 min',badge:'⏱ 45 min'}]}]}
+};
+
+function getExLevel(c,i){return exLevels[c+'_'+i]??0}
+function setExLevel(c,i,l){exLevels[c+'_'+i]=l;saveAll()}
+
+function renderMoves(){
+  const d=today(); const f=d.fatigue;
+  const isRec=f!==null&&f>=7;
+  $('recovery-moves').style.display=isRec?'block':'none';
+  $('full-moves').style.display=isRec?'none':'block';
+  $('moves-mode-badge').textContent=isRec?'Rest Mode':'Full Mode';
+  if(!isRec){['lymph','mobility','strength','cardio'].forEach(id=>renderCat(id,id+'-exercises'));}
+}
+
+function renderCat(catId,cid){
+  const cat=CATS[catId]; const con=$(cid); if(!con)return; con.innerHTML='';
+  cat.exercises.forEach((ex,ei)=>{
+    const cl=getExLevel(catId,ei); const ld=ex.levels[cl]; const tot=ex.levels.length;
+    let pips='';
+    for(let p=0;p<tot;p++){
+      let c='level-pip';
+      if(p<cl) c+=cat.pc?' pip-fill'+cat.pc:' pip-fill';
+      if(p===cl) c+=cat.pc?' pip-cur'+cat.pc:' pip-cur';
+      pips+=`<span class="${c}"></span>`;
+    }
+    const card=document.createElement('div');
+    card.className='exercise-item'; card.style.borderLeftColor=cat.ac;
+    card.innerHTML=`<span class="ex-icon">${ex.icon}</span><div style="flex:1"><h3 style="margin-bottom:3px">${ex.name}</h3><p style="font-size:12px;color:var(--text-soft);line-height:1.4">${ld.desc}</p><span class="ex-badge" style="color:${cat.ac};background:${cat.as}">${ld.badge}</span><div class="level-strip"><div style="display:flex;align-items:center;gap:7px"><div class="level-pips">${pips}</div><span class="lv-label" style="color:${cat.ac}">Lvl ${cl+1} · ${ld.label}</span></div><button class="lv-ctrl" style="${cat.bc}" data-cat="${catId}" data-ex="${ei}">✦ My Level</button></div></div>`;
+    con.appendChild(card);
+  });
+  con.querySelectorAll('.lv-ctrl').forEach(btn=>btn.addEventListener('click',()=>openLevelSheet(btn.dataset.cat,parseInt(btn.dataset.ex))));
+}
+
+// Level sheet
+function openLevelSheet(catId,exIdx){
+  const cat=CATS[catId]; const ex=cat.exercises[exIdx]; const cl=getExLevel(catId,exIdx);
+  $('level-sheet-title').textContent=`${ex.icon} ${ex.name}`;
+  $('level-cur-name').textContent=`Level ${cl+1} — ${ex.levels[cl].label}`;
+  $('level-cur-desc').textContent=ex.levels[cl].desc;
+  const ch=$('level-choices'); ch.innerHTML='';
+  if(cl<ex.levels.length-1){
+    const nl=ex.levels[cl+1]; const up=document.createElement('button'); up.className='sheet-choice choice-up';
+    up.innerHTML=`<span class="choice-icon">🚀</span><div><span class="choice-title">Step it up! I'm ready for more</span><span class="choice-desc">Next: <strong>${nl.label}</strong> — ${nl.desc}</span></div>`;
+    up.addEventListener('click',()=>applyLevel(catId,exIdx,cl+1,'up')); ch.appendChild(up);
+  } else {
+    const mx=document.createElement('button'); mx.className='sheet-choice choice-up'; mx.style.opacity='.7';
+    mx.innerHTML=`<span class="choice-icon">🏆</span><div><span class="choice-title">You're at the top level!</span><span class="choice-desc">You've mastered this one. 🌟</span></div>`;
+    mx.addEventListener('click',closeLevelSheet); ch.appendChild(mx);
+  }
+  const st=document.createElement('button'); st.className='sheet-choice choice-stay';
+  st.innerHTML=`<span class="choice-icon">💛</span><div><span class="choice-title" style="color:var(--rose-dark)">This feels just right for now</span><span class="choice-desc">Staying here is a great choice.</span></div>`;
+  st.addEventListener('click',()=>{closeLevelSheet();toast('💛 Staying right here — perfect!');});
+  ch.appendChild(st);
+  if(cl>0){
+    const pl=ex.levels[cl-1]; const dn=document.createElement('button'); dn.className='sheet-choice choice-down';
+    dn.innerHTML=`<span class="choice-icon">🌿</span><div><span class="choice-title" style="color:#8a6e00">Not feeling it — dial it back</span><span class="choice-desc">Back to: <strong>${pl.label}</strong>. Listening to your body is wisdom. 💕</span></div>`;
+    dn.addEventListener('click',()=>applyLevel(catId,exIdx,cl-1,'down')); ch.appendChild(dn);
+  }
+  openSheet('level-overlay','level-sheet');
+}
+function closeLevelSheet(){closeSheet('level-overlay','level-sheet');}
+$('level-overlay').addEventListener('click',closeLevelSheet);
+function applyLevel(catId,exIdx,nl,dir){
+  setExLevel(catId,exIdx,nl); closeLevelSheet();
+  const ex=CATS[catId].exercises[exIdx]; const ld=ex.levels[nl];
+  const cmap={lymph:'lymph-exercises',mobility:'mobility-exercises',strength:'strength-exercises',cardio:'cardio-exercises'};
+  if(dir==='up') celebrate('🎉','You stepped it up!',`"${ld.label}" for ${ex.name}. That takes courage! 🌟`);
+  else toast(`🌿 Dialling back to "${ld.label}" — listening to your body is the best workout. 💕`,'soft',3500);
+  renderCat(catId,cmap[catId]);
+}
+
+// Walk save
+$('walk-save').addEventListener('click',()=>{
+  const val=parseInt($('walk-input').value)||0;
+  const d=today(); d.walkMins=val; saveAll();
+  $('stat-walk').textContent=val;
+  const el=$('walk-guilt');
+  if(val===0){el.style.display='block';el.textContent='Listening to your body is the best workout today. 💕';}
+  else if(val<10){el.style.display='block';el.textContent=`${val} mins of movement — every step counts. 🌟`;}
+  else if(val>=30){el.style.display='none';celebrate('🚶',`You walked ${val} minutes!`,'Your heart and lungs are building back! 💪');}
+  else{el.style.display='none';toast(`🚶 ${val} mins logged! Great work!`,'celebrate');}
+  $('walk-input').value='';
+  renderDaySummary();
+});
+
+// ═══════════════════════════════════════
+//  FUEL
+// ═══════════════════════════════════════
+function buildDroplets(){
+  const d=today(); const c=$('droplets'); c.innerHTML='';
+  for(let i=0;i<8;i++){
+    const el=document.createElement('span');
+    el.className='droplet'+(i<d.water?' filled':'');
+    el.textContent='💧'; el.title=`Glass ${i+1} = ${(i+1)*250}ml`;
+    el.addEventListener('click',()=>toggleDroplet(i)); c.appendChild(el);
+  }
+  updateWaterUI();
+}
+function toggleDroplet(i){
+  const d=today(); const prev=d.water;
+  d.water=(i<d.water)?i:i+1; saveAll(); buildDroplets();
+  $('stat-water').textContent=d.water;
+  const cel=$('water-cel');
+  const ms={2:'🌱 Two glasses (500ml)! Your kidneys are smiling.',4:'💧 One whole litre! Your liver loves you. 🎉',6:'🌊 Six glasses — 1.5L! Chemo byproducts getting flushed!',8:'🏆 FULL 2 LITRES! Perfect hydration! Your ALT will thank you. 💛'};
+  if(d.water>prev&&ms[d.water]){cel.textContent=ms[d.water];cel.style.display='block';setTimeout(()=>cel.style.display='none',4000);}
+  else if(d.water<=prev) cel.style.display='none';
+  renderDaySummary();
+}
+function updateWaterUI(){
+  const d=today(); const ml=d.water*250;
+  $('water-ml').innerHTML=`${ml.toLocaleString()} <small style="font-size:11px;font-family:var(--font-body);color:var(--text-soft);font-weight:700">ml</small>`;
+  const msgs=['Let\'s get that first sip! 💧','250ml — great start!','500ml! Keep going 💪','750ml — almost a litre!','1 litre 🎉 Halfway!','1.25L — flushing those chemo bits!','1.5L — wow! 🌊','1.75L — one more! Almost there!','2 litres! 🏆 Perfect!'];
+  $('water-msg').textContent=msgs[Math.min(d.water,8)];
+}
+
+function buildCheckList(lid,sk){
+  const d=today(); const list=$(lid); if(!list)return;
+  list.querySelectorAll('li').forEach(li=>{
+    const id=li.dataset.id;
+    if(d[sk]&&d[sk][id]) li.classList.add('done');
+    li.querySelector('.check-box').textContent=d[sk]&&d[sk][id]?'✓':'';
+    li.addEventListener('click',()=>{
+      if(!d[sk]) d[sk]={};
+      d[sk][id]=!d[sk][id];
+      li.classList.toggle('done',d[sk][id]);
+      li.querySelector('.check-box').textContent=d[sk][id]?'✓':'';
+      saveAll(); if(lid==='protein-list') updateProteinUI();
+    });
+  });
+  if(lid==='protein-list') updateProteinUI();
+}
+
+function updateProteinUI(){
+  const d=today(); const n=Object.values(d.proteins||{}).filter(Boolean).length;
+  $('protein-prog').style.width=Math.round((n/6)*100)+'%';
+  $('stat-protein').textContent=n+'/6';
+  const ms={0:'',1:'✨ First one in! Every bit helps.',2:'💪 Two hits!',3:'🌟 Three — a solid protein day.',4:'🔥 Four hits — exactly what your body needs!',5:'⚡ Five!! Almost perfect!',6:'🏆 ALL 6! Premium fuel for healing! 💖'};
+  $('protein-milestone').textContent=ms[n]||'';
+  $('protein-guilt').style.display=n===0?'block':'none';
+}
+
+$('bland-toggle').addEventListener('change',e=>{
+  bland=e.target.checked; saveAll();
+  $('bland-mode').style.display=bland?'block':'none';
+  $('normal-fuel').style.display=bland?'none':'block';
+});
+
+function initFuel(){
+  $('bland-toggle').checked=bland;
+  $('bland-mode').style.display=bland?'block':'none';
+  $('normal-fuel').style.display=bland?'none':'block';
+  buildDroplets();
+  buildCheckList('protein-list','proteins');
+  buildCheckList('bland-list','blandItems');
+  applyModuleVisibility();
+}
+
+// Drain
+$('drain-save').addEventListener('click',()=>{
+  const l=parseFloat($('drain-left').value)||null;
+  const r=parseFloat($('drain-right').value)||null;
+  const col=$('drain-colour').value;
+  if(!l&&!r){toast('⚠️ Enter at least one drain value');return;}
+  drainLogs.push({date:todayFmt,isoDate:todayISO,left:l,right:r,colour:col,total:(l||0)+(r||0)});
+  saveAll(); $('drain-left').value=''; $('drain-right').value=''; $('drain-colour').value='';
+  renderDrainList(); toast('🧴 Drain output logged!');
+});
+
+function renderDrainList(){
+  const c=$('drain-log-list'); if(!c)return; c.innerHTML='';
+  const colourInfo={red:{bg:'#fee',dot:'#e44'},pink:{bg:'#fdf0f4',dot:'#E87A98'},yellow:{bg:'#fffbe0',dot:'#F5C800'},clear:{bg:'#f0f8ff',dot:'#5AAAD4'},'':{bg:'#f5f5f5',dot:'#aaa'}};
+  [...drainLogs].reverse().slice(0,10).forEach((e,i)=>{
+    const ci=colourInfo[e.colour]||colourInfo[''];
+    const el=document.createElement('div');
+    el.className='drain-entry';
+    el.style.cssText=`display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px dashed #e8f0e5`;
+    el.innerHTML=`<span style="font-size:12px;color:var(--text-soft)">${e.date}</span><span style="font-size:13px;font-weight:800">${e.left?'L: '+e.left+'ml ':''} ${e.right?'R: '+e.right+'ml':''} <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${ci.dot};margin-left:4px;vertical-align:middle"></span></span><button class="le-del" data-idx="${drainLogs.length-1-i}">🗑</button>`;
+    c.appendChild(el);
+  });
+  c.querySelectorAll('.le-del').forEach(btn=>btn.addEventListener('click',()=>{drainLogs.splice(parseInt(btn.dataset.idx),1);saveAll();renderDrainList();}));
+}
+
+// Weight
+$('weight-save').addEventListener('click',()=>{
+  const v=parseFloat($('weight-input').value);
+  if(isNaN(v)||v<30){toast('⚠️ Enter a valid weight');return;}
+  weightLogs.push({date:todayFmt,isoDate:todayISO,val:v});
+  if(weightLogs.length>52) weightLogs.shift();
+  saveAll(); $('weight-input').value=''; renderWeightList(); toast(`⚖️ ${v}kg logged!`);
+});
+function renderWeightList(){
+  const c=$('weight-list'); if(!c)return; c.innerHTML='';
+  [...weightLogs].reverse().slice(0,8).forEach((e,i)=>{
+    const el=document.createElement('div'); el.className='weight-entry';
+    el.innerHTML=`<span style="font-size:12px;color:var(--text-soft)">${e.date}</span><span class="weight-val">${e.val} <small style="font-size:12px;font-family:var(--font-body);color:var(--text-soft)">kg</small></span><button class="le-del" data-idx="${weightLogs.length-1-i}">🗑</button>`;
+    c.appendChild(el);
+  });
+  c.querySelectorAll('.le-del').forEach(btn=>btn.addEventListener('click',()=>{weightLogs.splice(parseInt(btn.dataset.idx),1);saveAll();renderWeightList();}));
+}
+
+// Meds
+$('med-save').addEventListener('click',()=>{
+  const name=$('med-name').value.trim(); const dose=$('med-dose').value.trim();
+  if(!name){toast('⚠️ Enter medication name');return;}
+  const eff=$('med-effectiveness').value;
+  medLogs.push({date:todayFmt,isoDate:todayISO,name,dose,effectiveness:eff});
+  if(medLogs.length>100) medLogs.shift();
+  saveAll(); $('med-name').value=''; $('med-dose').value=''; $('med-effectiveness').value='';
+  renderMedList(); toast(`💊 ${name} logged!`);
+});
+function renderMedList(){
+  const c=$('med-list'); if(!c)return; c.innerHTML='';
+  const effLabels={'worked-well':'✅ Worked well','partial':'🟡 Partial','no-effect':'❌ No effect','side-effects':'⚠️ Side effects'};
+  [...medLogs].reverse().slice(0,8).forEach((e,i)=>{
+    const el=document.createElement('div'); el.className='log-entry';
+    el.innerHTML=`<span class="le-date">${e.date}</span><span style="flex:1;font-size:13px;font-weight:700;padding:0 8px">${e.name}${e.dose?' · '+e.dose:''}</span>${e.effectiveness?`<span style="font-size:11px;font-weight:800;color:var(--text-soft)">${effLabels[e.effectiveness]||''}</span>`:''}`;
+    c.appendChild(el);
+  });
+}
+
+// ═══════════════════════════════════════
+//  DOCTOR NOTES FOR APPOINTMENT
+// ═══════════════════════════════════════
+let docNotes = store.get('rc_doc_notes', []);
+// [{id, isoDate, displayDate, text, raised}]
+
+$('doc-note-save').addEventListener('click', function() {
+  var txt = $('doc-note-input').value.trim();
+  if (!txt) { toast('Write something first!'); return; }
+  var id = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  docNotes.unshift({id:id, isoDate:todayISO, displayDate:formatISO(todayISO), text:txt, raised:false});
+  store.set('rc_doc_notes', docNotes);
+  $('doc-note-input').value = '';
+  renderDocNotes();
+  toast('Saved to your appointment notes! 📋');
+});
+
+function renderDocNotes() {
+  var activeEl   = $('doc-notes-active');
+  var emptyEl    = $('doc-notes-empty');
+  var archWrap   = $('doc-archive-wrap');
+  var archEl     = $('doc-notes-archive');
+  var archCount  = $('doc-archive-count');
+  if (!activeEl) return;
+
+  var active   = docNotes.filter(function(n){ return !n.raised; });
+  var archived = docNotes.filter(function(n){ return n.raised; });
+
+  emptyEl.style.display = active.length ? 'none' : 'block';
+
+  // Clear old dynamic groups (keep emptyEl)
+  Array.from(activeEl.children).forEach(function(c){ if (c !== emptyEl) c.remove(); });
+
+  // Group active by date, newest first
+  var byDate = {};
+  active.forEach(function(n){
+    if (!byDate[n.isoDate]) byDate[n.isoDate] = [];
+    byDate[n.isoDate].push(n);
+  });
+  Object.keys(byDate).sort(function(a,b){ return b.localeCompare(a); }).forEach(function(iso){
+    var group = document.createElement('div');
+    group.className = 'doc-note-group';
+    group.innerHTML = '<div class="doc-note-group-date">' + formatISO(iso) + (iso===todayISO ? ' — Today' : '') + '</div>';
+    byDate[iso].forEach(function(n){ group.appendChild(buildNoteItem(n)); });
+    activeEl.appendChild(group);
+  });
+
+  archCount.textContent = archived.length;
+  archWrap.style.display = archived.length ? 'block' : 'none';
+  var archVisible = archEl && archEl.style.display !== 'none';
+  if (archVisible) renderDocNotesArchive();
+}
+
+function renderDocNotesArchive() {
+  var archEl = $('doc-notes-archive');
+  if (!archEl) return;
+  archEl.innerHTML = '';
+  var archived = docNotes.filter(function(n){ return n.raised; });
+  var byDate = {};
+  archived.forEach(function(n){
+    if (!byDate[n.isoDate]) byDate[n.isoDate] = [];
+    byDate[n.isoDate].push(n);
+  });
+  Object.keys(byDate).sort(function(a,b){ return b.localeCompare(a); }).forEach(function(iso){
+    var group = document.createElement('div');
+    group.className = 'doc-note-group';
+    group.innerHTML = '<div class="doc-note-group-date" style="color:var(--text-xsoft)">' + formatISO(iso) + ' (raised)</div>';
+    byDate[iso].forEach(function(n){ group.appendChild(buildNoteItem(n)); });
+    archEl.appendChild(group);
+  });
+}
+
+function buildNoteItem(n) {
+  var item = document.createElement('div');
+  item.className = 'doc-note-item' + (n.raised ? ' raised' : '');
+  item.innerHTML =
+    '<div class="doc-note-checkbox">' + (n.raised ? '✓' : '') + '</div>' +
+    '<span class="doc-note-text">' + escHtml(n.text) + '</span>' +
+    '<button class="doc-note-del" title="Delete note">✕</button>';
+
+  function toggleRaise() {
+    n.raised = !n.raised;
+    store.set('rc_doc_notes', docNotes);
+    if (n.raised) toast('Raised with your doctor — archived! 🎉', 'celebrate');
+    renderDocNotes();
+  }
+  item.querySelector('.doc-note-checkbox').addEventListener('click', toggleRaise);
+  item.querySelector('.doc-note-text').addEventListener('click', toggleRaise);
+  item.querySelector('.doc-note-del').addEventListener('click', function(e){
+    e.stopPropagation();
+    docNotes = docNotes.filter(function(x){ return x.id !== n.id; });
+    store.set('rc_doc_notes', docNotes);
+    renderDocNotes();
+  });
+  return item;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+$('doc-archive-toggle').addEventListener('click', function() {
+  var archEl  = $('doc-notes-archive');
+  var chevron = $('doc-archive-chevron');
+  var isOpen  = archEl.style.display !== 'none';
+  archEl.style.display = isOpen ? 'none' : 'block';
+  chevron.textContent  = isOpen ? '▶' : '▼';
+  if (!isOpen) renderDocNotesArchive();
+});
+
+// ═══════════════════════════════════════
+//  TREND REPORT
+// ═══════════════════════════════════════
+var TREND_METRICS = [
+  {key:'fatigue',  label:'Fatigue', color:'#E87A98', maxVal:10},
+  {key:'pain',     label:'Pain',    color:'#F5934A', maxVal:5},
+  {key:'nausea',   label:'Nausea',  color:'#9B7FE0', maxVal:5},
+  {key:'mood',     label:'Mood',    color:'#6DD4A0', maxVal:4},
+  {key:'sleep',    label:'Sleep',   color:'#5AAAD4', maxVal:4},
+  {key:'water',    label:'Water',   color:'#A8E6C3', maxVal:8},
+  {key:'walkMins', label:'Walk',    color:'#F5C800', maxVal:null},
+];
+
+var trendPeriod = 'week';
+var trendActive = {fatigue:true, mood:true, sleep:true, pain:true, nausea:false, water:false, walkMins:false};
+
+function initTrendControls() {
+  document.querySelectorAll('.period-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      trendPeriod = btn.dataset.period;
+      renderTrendChart();
+    });
+  });
+
+  var wrap = $('metric-toggles');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  TREND_METRICS.forEach(function(m){
+    var btn = document.createElement('button');
+    btn.className = 'metric-toggle' + (trendActive[m.key] ? ' on' : '');
+    btn.style.color = m.color;
+    btn.innerHTML = '<span class="mt-dot" style="background:' + m.color + '"></span>' + m.label;
+    btn.addEventListener('click', function(){
+      trendActive[m.key] = !trendActive[m.key];
+      btn.classList.toggle('on', trendActive[m.key]);
+      renderTrendChart();
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+function getTrendRows() {
+  var days = trendPeriod === 'week' ? 7 : trendPeriod === 'month' ? 30 : 90;
+  var rows = [];
+  for (var i = days-1; i >= 0; i--) {
+    var d = new Date(); d.setDate(d.getDate() - i);
+    var iso = toISO(d);
+    var rec = dayData[iso] || {};
+    var label = trendPeriod === 'week'
+      ? formatISOShort(iso)
+      : (trendPeriod === 'month' ? String(d.getDate()) : formatISOShort(iso));
+    rows.push({iso:iso, label:label, rec:rec});
+  }
+  return rows;
+}
+
+function renderTrendChart() {
+  var canvas = $('trend-chart');
+  if (!canvas) return;
+  var rows    = getTrendRows();
+  var metrics = TREND_METRICS.filter(function(m){ return trendActive[m.key]; });
+
+  var dpr = window.devicePixelRatio || 1;
+  var W   = canvas.offsetWidth || 340;
+  var H   = 200;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  if (!metrics.length || !rows.length) {
+    ctx.fillStyle = '#bbb'; ctx.font = '12px Nunito,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Select at least one metric above', W/2, H/2);
+    return;
+  }
+
+  var pad = {t:16, r:14, b:30, l:28};
+  var aw  = W - pad.l - pad.r;
+  var ah  = H - pad.t - pad.b;
+  var n   = rows.length;
+
+  // Grid lines
+  ctx.strokeStyle = '#f0ece8'; ctx.lineWidth = 1;
+  for (var g=0; g<=4; g++) {
+    var gy = pad.t + (g/4)*ah;
+    ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(pad.l+aw, gy); ctx.stroke();
+  }
+
+  // X labels — every Nth
+  var every = n <= 7 ? 1 : n <= 30 ? 5 : 15;
+  ctx.fillStyle = '#9aabb0'; ctx.font = '9px Nunito,sans-serif'; ctx.textAlign = 'center';
+  rows.forEach(function(r, i){
+    if (i % every === 0 || i === n-1) {
+      var x = pad.l + (i/(n-1||1))*aw;
+      ctx.fillText(r.label, x, H-6);
+    }
+  });
+
+  // Draw each metric
+  metrics.forEach(function(m){
+    // Compute dynamic max for walk (no fixed scale)
+    var dynMax = m.maxVal;
+    if (!dynMax) {
+      dynMax = 1;
+      rows.forEach(function(r){ var v=r.rec[m.key]; if(v!=null&&v>dynMax) dynMax=v; });
+    }
+
+    ctx.beginPath();
+    ctx.strokeStyle = m.color;
+    ctx.lineWidth   = 2;
+    ctx.lineJoin    = 'round';
+    var started = false;
+
+    rows.forEach(function(r, i){
+      var raw = r.rec[m.key];
+      if (raw === null || raw === undefined) { started = false; return; }
+      // Fatigue stored 0-based internally, display 1-10
+      var v = m.key === 'fatigue' ? (raw+1) : raw;
+      var norm = Math.min(v / dynMax, 1);
+      var x = pad.l + (i/(n-1||1))*aw;
+      var y = pad.t + ah - norm*ah;
+      if (!started) { ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // Dots on week view
+    if (trendPeriod === 'week') {
+      rows.forEach(function(r, i){
+        var raw = r.rec[m.key];
+        if (raw === null || raw === undefined) return;
+        var v = m.key === 'fatigue' ? (raw+1) : raw;
+        var norm = Math.min(v / dynMax, 1);
+        var x = pad.l + (i/(n-1||1))*aw;
+        var y = pad.t + ah - norm*ah;
+        ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2);
+        ctx.fillStyle = m.color; ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+      });
+    }
+  });
+
+  // Legend
+  var legend = $('trend-legend');
+  if (legend) {
+    legend.innerHTML = metrics.map(function(m){
+      var dynMax = m.maxVal || 'auto';
+      return '<span class="trend-legend-item">' +
+        '<span class="tl-line" style="background:' + m.color + '"></span>' +
+        m.label + ' <span style="opacity:.6;font-size:10px">(÷' + dynMax + ')</span>' +
+        '</span>';
+    }).join('');
+  }
+}
+
+// ═══════════════════════════════════════
+//  CALENDAR (optional module)
+// ═══════════════════════════════════════
+var calYear     = new Date().getFullYear();
+var calMonth    = new Date().getMonth();
+var selectedISO = todayISO;
+
+function buildCalendar() {
+  var label = $('cal-month-label');
+  if (!label) return;
+  var months = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+  label.textContent = months[calMonth] + ' ' + calYear;
+  var grid = $('cal-grid');
+  grid.innerHTML = '';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(function(d){
+    var h = document.createElement('div'); h.className='cal-day-label'; h.textContent=d; grid.appendChild(h);
+  });
+  var firstDow    = (new Date(calYear,calMonth,1).getDay()+6)%7;
+  var daysInMonth = new Date(calYear,calMonth+1,0).getDate();
+  for (var e=0; e<firstDow; e++) {
+    var emp=document.createElement('div'); emp.className='cal-day empty'; grid.appendChild(emp);
+  }
+  for (var d=1; d<=daysInMonth; d++) {
+    var iso  = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var cell = document.createElement('div');
+    var rec  = dayData[iso];
+    var f    = rec ? rec.fatigue : undefined;
+    cell.className = 'cal-day ' + (f==null ? 'cf-none' : 'cf-'+(f+1));
+    if (iso===todayISO)    cell.classList.add('today');
+    if (iso===selectedISO) cell.classList.add('selected');
+    cell.textContent = d;
+    if (rec && (rec.fatigue!==null || rec.water>0 || rec.walkMins>0)) {
+      var dot=document.createElement('span'); dot.className='cal-dot'; cell.appendChild(dot);
+    }
+    (function(capturedIso){
+      cell.addEventListener('click', function(){ selectedISO=capturedIso; buildCalendar(); showDayDetail(capturedIso); });
+    })(iso);
+    grid.appendChild(cell);
+  }
+  showDayDetail(selectedISO);
+}
+
+var calPrevBtn = $('cal-prev');
+var calNextBtn = $('cal-next');
+if (calPrevBtn) calPrevBtn.addEventListener('click', function(){
+  calMonth--; if(calMonth<0){calMonth=11;calYear--;} buildCalendar();
+});
+if (calNextBtn) calNextBtn.addEventListener('click', function(){
+  calMonth++; if(calMonth>11){calMonth=0;calYear++;} buildCalendar();
+});
+
+function showDayDetail(iso) {
+  var panel = $('day-detail');
+  if (!panel) return;
+  panel.style.display = 'block';
+  var dl = $('dd-date-label');
+  var eb = $('dd-edit-btn');
+  if (dl) dl.textContent = formatISO(iso) + (iso===todayISO ? ' (Today)' : '');
+  if (eb) eb.dataset.iso = iso;
+  var rec = dayData[iso] || {};
+  var metrics = $('dd-metrics');
+  if (!metrics) return;
+  metrics.innerHTML = '';
+  var FIELDS = [
+    {key:'fatigue', label:'Fatigue', fmt:function(v){ return (v+1)+'/10'; }},
+    {key:'pain',    label:'Pain',    fmt:function(v){ return ['None','Mild','Moderate','Discomfort','Bad','Severe'][v]; }},
+    {key:'nausea',  label:'Nausea',  fmt:function(v){ return ['None','Mild','Moderate','Bad','Vomiting','Very sick'][v]; }},
+    {key:'mood',    label:'Mood',    fmt:function(v){ return ['Struggling','Low','Okay','Good','Great'][v]; }},
+    {key:'sleep',   label:'Sleep',   fmt:function(v){ return ['Terrible','Poor','Okay','Good','Great'][v]; }},
+    {key:'water',   label:'Water',   fmt:function(v){ return v+'×250ml'; }},
+    {key:'walkMins',label:'Walk',    fmt:function(v){ return v+' min'; }},
+  ];
+  FIELDS.forEach(function(f){
+    var val = rec[f.key];
+    if (val===null||val===undefined) return;
+    if ((f.key==='water'||f.key==='walkMins') && val===0) return;
+    var m = document.createElement('div'); m.className='dd-metric';
+    m.innerHTML='<div class="dd-metric-label">'+f.label+'</div><div class="dd-metric-val">'+f.fmt(val)+'</div>';
+    metrics.appendChild(m);
+  });
+  if (!metrics.children.length)
+    metrics.innerHTML='<p style="font-size:12px;color:var(--text-soft);grid-column:1/-1">No data logged yet for this day.</p>';
+}
+
+var ddEditBtn = $('dd-edit-btn');
+if (ddEditBtn) ddEditBtn.addEventListener('click', function(){ openEditModal(ddEditBtn.dataset.iso||todayISO); });
+
+function openEditModal(iso) {
+  $('edit-modal-date').textContent = formatISO(iso) + (iso===todayISO ? ' (Today)' : '');
+  var d = getDay(iso);
+  var fields = $('edit-fields'); fields.innerHTML='';
+  var DEFS = [
+    {key:'fatigue', label:'Fatigue (enter 1–10)',   min:1,  max:10},
+    {key:'pain',    label:'Pain (0=None, 5=Severe)', min:0,  max:5},
+    {key:'nausea',  label:'Nausea (0=None, 5=Severe)',min:0, max:5},
+    {key:'mood',    label:'Mood (0=Low, 4=Great)',   min:0,  max:4},
+    {key:'sleep',   label:'Sleep (0=Terrible, 4=Great)',min:0,max:4},
+    {key:'water',   label:'Water glasses (0–8)',      min:0,  max:8},
+    {key:'walkMins',label:'Walk minutes',             min:0,  max:600},
+  ];
+  DEFS.forEach(function(def){
+    var raw = d[def.key];
+    var display = (def.key==='fatigue' && raw!==null && raw!==undefined) ? raw+1 : raw;
+    var wrap=document.createElement('div'); wrap.className='edit-field';
+    wrap.innerHTML='<label>'+def.label+'</label>' +
+      '<input type="number" data-key="'+def.key+'" min="'+def.min+'" max="'+def.max+'"' +
+      ' value="'+(display!==null&&display!==undefined?display:'')+'" placeholder="Leave blank to clear"/>';
+    fields.appendChild(wrap);
+  });
+  $('edit-modal-overlay').dataset.iso=iso;
+  $('edit-modal-overlay').classList.add('open');
+}
+
+$('edit-cancel').addEventListener('click', function(){ $('edit-modal-overlay').classList.remove('open'); });
+$('edit-save').addEventListener('click', function(){
+  var iso = $('edit-modal-overlay').dataset.iso;
+  var d   = getDay(iso);
+  $('edit-fields').querySelectorAll('input[data-key]').forEach(function(inp){
+    var key=inp.dataset.key; var raw=inp.value.trim();
+    if (raw==='') { d[key]=null; return; }
+    var v=parseFloat(raw); if(isNaN(v)) return;
+    d[key] = (key==='fatigue') ? Math.min(9,Math.max(0,v-1)) : v;
+  });
+  saveAll();
+  $('edit-modal-overlay').classList.remove('open');
+  if (settings.mod_calendar) { buildCalendar(); showDayDetail(iso); }
+  renderHome(); renderDaySummary();
+  toast('Day updated!', 'celebrate');
+});
+
+
+
+function openEditModal(iso){
+  $('edit-modal-date').textContent=formatISO(iso)+(iso===todayISO?' (Today)':'');
+  const d=getDay(iso);
+  const fields=$('edit-fields'); fields.innerHTML='';
+
+  const editDefs=[
+    {key:'fatigue',label:'Fatigue (1–10)',type:'number',min:1,max:10,fmt:v=>v!==null?v+1:null,parse:v=>v-1},
+    {key:'pain',label:'Pain (0=None, 5=Severe)',type:'number',min:0,max:5,fmt:v=>v,parse:v=>v},
+    {key:'nausea',label:'Nausea (0=None, 5=Very sick)',type:'number',min:0,max:5,fmt:v=>v,parse:v=>v},
+    {key:'mood',label:'Mood (0=Struggling, 4=Great)',type:'number',min:0,max:4,fmt:v=>v,parse:v=>v},
+    {key:'sleep',label:'Sleep quality (0=Terrible, 4=Great)',type:'number',min:0,max:4,fmt:v=>v,parse:v=>v},
+    {key:'water',label:'Water (glasses, 0–8)',type:'number',min:0,max:8,fmt:v=>v,parse:v=>v},
+    {key:'walkMins',label:'Walk minutes',type:'number',min:0,max:600,fmt:v=>v,parse:v=>v},
+  ];
+  editDefs.forEach(def=>{
+    const wrap=document.createElement('div'); wrap.className='edit-field';
+    const val=d[def.key];
+    const displayVal=def.fmt(val);
+    wrap.innerHTML=`<label>${def.label}</label><input type="${def.type}" data-key="${def.key}" data-parse="${def.parse.toString()}" min="${def.min}" max="${def.max}" value="${displayVal!==null&&displayVal!==undefined?displayVal:''}" placeholder="Leave blank to clear"/>`;
+    fields.appendChild(wrap);
+  });
+
+  $('edit-modal-overlay').dataset.iso=iso;
+  $('edit-modal-overlay').classList.add('open');
+}
+
+$('edit-cancel').addEventListener('click',()=>$('edit-modal-overlay').classList.remove('open'));
+$('edit-save').addEventListener('click',()=>{
+  const iso=$('edit-modal-overlay').dataset.iso;
+  const d=getDay(iso);
+  $('edit-fields').querySelectorAll('input[data-key]').forEach(inp=>{
+    const key=inp.dataset.key; const raw=inp.value.trim();
+    if(raw===''){d[key]=null;return;}
+    const v=parseFloat(raw);
+    if(isNaN(v)) return;
+    // Apply inverse transform for fatigue (stored as 0-indexed)
+    if(key==='fatigue') d[key]=Math.min(9,Math.max(0,v-1));
+    else d[key]=v;
+  });
+  saveAll(); $('edit-modal-overlay').classList.remove('open');
+  buildCalendar(); showDayDetail(iso); renderHome(); renderDaySummary();
+  toast('✓ Day updated!','celebrate');
+});
+
+// ═══════════════════════════════════════
+//  PHASES
+// ═══════════════════════════════════════
+function buildPhaseTrack(){
+  const track=$('phase-track'); track.innerHTML='';
+  PHASES.forEach((ph,i)=>{
+    const step=document.createElement('div'); step.className='phase-step';
+    const dc=i<phase?'done':i===phase?'active':'future';
+    const nc=i===phase?'active-lbl':'';
+    step.innerHTML=`<div class="phase-dot ${dc}">${i<phase?'✓':ph.icon}</div><span class="phase-name ${nc}">${ph.shortName}</span>`;
+    step.addEventListener('click',()=>{$('phase-dtitle').textContent=`${ph.icon} ${ph.name}`;$('phase-ddesc').textContent=ph.desc;});
+    track.appendChild(step);
+  });
+  $('phase-dtitle').textContent=`${PHASES[phase].icon} ${PHASES[phase].name}`;
+  $('phase-ddesc').textContent=PHASES[phase].desc;
+}
+
+$('phase-advance-btn').addEventListener('click',openPhaseModal);
+function openPhaseModal(){
+  const cur=PHASES[phase]; const next=PHASES[phase+1];
+  $('phase-sheet-title').textContent=`${cur.icon} ${cur.name} Phase`;
+  const ch=$('phase-choices'); ch.innerHTML='';
+  if(next){
+    const adv=document.createElement('button'); adv.className='modal-choice pmc-adv';
+    adv.innerHTML=`<span class="choice-icon">${next.icon}</span><div><span class="choice-title">Moving to ${next.name}</span><span class="choice-desc">${next.desc}</span></div>`;
+    adv.addEventListener('click',()=>advancePhase(phase+1)); ch.appendChild(adv);
+  } else {
+    const mx=document.createElement('button'); mx.className='modal-choice pmc-adv';
+    mx.innerHTML=`<span class="choice-icon">🌟</span><div><span class="choice-title">You're thriving — you've earned every bit of it</span><span class="choice-desc">The final phase. Keep going, keep growing.</span></div>`;
+    mx.addEventListener('click',closePhaseSheet); ch.appendChild(mx);
+  }
+  const st=document.createElement('button'); st.className='modal-choice pmc-stay';
+  st.innerHTML=`<span class="choice-icon">💛</span><div><span class="choice-title" style="color:#8a6e00">Still here — and that's exactly right</span><span class="choice-desc">No rush, no deadline. Your body knows best.</span></div>`;
+  st.addEventListener('click',()=>{closePhaseSheet();toast('💛 Right where you need to be. 🌸');});
+  ch.appendChild(st);
+  if(phase>0){
+    const prev=PHASES[phase-1];
+    const bk=document.createElement('button'); bk.className='modal-choice pmc-back';
+    bk.innerHTML=`<span class="choice-icon">🌿</span><div><span class="choice-title" style="color:var(--rose-dark)">Things got harder — back to ${prev.name}</span><span class="choice-desc">Setbacks are part of recovery, never failure. 💕</span></div>`;
+    bk.addEventListener('click',()=>advancePhase(phase-1,true)); ch.appendChild(bk);
+  }
+  openSheet('phase-overlay','phase-sheet');
+}
+function closePhaseSheet(){closeSheet('phase-overlay','phase-sheet');}
+$('phase-overlay').addEventListener('click',closePhaseSheet);
+function advancePhase(np,isBack=false){
+  phase=np; saveAll(); closePhaseSheet(); buildPhaseTrack(); renderHome(); renderMoves();
+  const ph=PHASES[np];
+  if(isBack) toast(`🌿 Back to ${ph.name} — listening to your body takes wisdom. 💕`,'soft',3500);
+  else celebrate(ph.icon,`Welcome to ${ph.name}!`,ph.desc);
+}
+
+// ═══════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════
+function drawChart(canvas,data,h,lc,fc,lk='date',vk='val',refLine=null){
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=(canvas.offsetWidth||340)*window.devicePixelRatio;
+  canvas.height=h*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  const w=canvas.offsetWidth||340; ctx.clearRect(0,0,w,h);
+  if(!data.length){ctx.fillStyle='#bbb';ctx.font='12px Nunito,sans-serif';ctx.textAlign='center';ctx.fillText('No data yet',w/2,h/2);return;}
+  const vals=data.map(d=>d[vk]);
+  const minV=Math.min(...vals)*0.85,maxV=Math.max(...vals)*1.15||100;
+  const pad={t:18,r:14,b:32,l:36},aw=w-pad.l-pad.r,ah=h-pad.t-pad.b;
+  const toX=i=>pad.l+(i/(data.length-1||1))*aw;
+  const toY=v=>pad.t+ah-((v-minV)/(maxV-minV||1))*ah;
+  ctx.strokeStyle='#f0ece8';ctx.lineWidth=1;
+  for(let g=0;g<=4;g++){const y=pad.t+(g/4)*ah;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+aw,y);ctx.stroke();}
+  if(refLine!==null&&refLine<=maxV&&refLine>=minV){
+    ctx.strokeStyle='rgba(245,200,0,.8)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    const ry=toY(refLine);ctx.beginPath();ctx.moveTo(pad.l,ry);ctx.lineTo(pad.l+aw,ry);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#8a6e00';ctx.font='10px Nunito,sans-serif';ctx.textAlign='left';ctx.fillText(`≤${refLine}`,pad.l+3,ry-3);
+  }
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ah);grad.addColorStop(0,fc);grad.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.beginPath();ctx.moveTo(toX(0),toY(vals[0]));for(let i=1;i<data.length;i++)ctx.lineTo(toX(i),toY(vals[i]));
+  ctx.lineTo(toX(data.length-1),h-pad.b);ctx.lineTo(toX(0),h-pad.b);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=lc;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.moveTo(toX(0),toY(vals[0]));
+  for(let i=1;i<data.length;i++)ctx.lineTo(toX(i),toY(vals[i]));ctx.stroke();
+  data.forEach((d,i)=>{ctx.beginPath();ctx.arc(toX(i),toY(d[vk]),4,0,Math.PI*2);ctx.fillStyle=lc;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();});
+  ctx.fillStyle='#9aabb0';ctx.font='9px Nunito,sans-serif';ctx.textAlign='center';
+  data.forEach((d,i)=>ctx.fillText(d[lk],toX(i),h-6));
+  ctx.fillStyle='#ccc';ctx.font='9px Nunito,sans-serif';ctx.textAlign='right';
+  ctx.fillText(Math.round(maxV),pad.l-3,pad.t+4);ctx.fillText(Math.round(minV),pad.l-3,pad.t+ah);
+}
+
+function renderALTChart(){
+  drawChart($('alt-chart'),altLogs.slice(-12),150,'#E87A98','rgba(242,167,184,.35)','date','val',40);
+}
+function renderALTList(){
+  const c=$('alt-log-list'); if(!c)return; c.innerHTML='';
+  [...altLogs].reverse().slice(0,5).forEach((e,i)=>{
+    const el=document.createElement('div'); el.className='log-entry';
+    el.innerHTML=`<span class="le-date">${e.date}</span><span class="le-val">${e.val} <small style="font-size:10px;color:var(--text-soft)">U/L</small></span><button class="le-del" data-idx="${altLogs.length-1-i}">🗑</button>`;
+    c.appendChild(el);
+  });
+  c.querySelectorAll('.le-del').forEach(btn=>btn.addEventListener('click',()=>{altLogs.splice(parseInt(btn.dataset.idx),1);saveAll();renderALTChart();renderALTList();}));
+}
+$('alt-save').addEventListener('click',()=>{
+  const v=parseFloat($('alt-input').value);
+  if(isNaN(v)||v<0){toast('⚠️ Enter a valid ALT value');return;}
+  altLogs.push({date:todayFmt,isoDate:todayISO,val:v});
+  if(altLogs.length>50) altLogs.shift();
+  saveAll(); $('alt-input').value=''; renderALTChart(); renderALTList(); toast(`🩸 ALT ${v} U/L logged!`);
+});
+
+
+// ═══════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════
+const SETTINGS_CI_DEFS = [
+  {key:'ci_fatigue',label:'Fatigue score',desc:'Always on — core check-in',locked:true},
+  {key:'ci_pain',label:'Pain level',desc:'Rate discomfort (0–5)'},
+  {key:'ci_nausea',label:'Nausea / vomiting',desc:'Rate nausea (0–5)'},
+  {key:'ci_mood',label:'Mood check',desc:'Emotional wellbeing (5 levels)'},
+  {key:'ci_sleep',label:'Sleep quality',desc:'Last night\'s sleep rating'},
+  {key:'ci_bowel',label:'Bowel health',desc:'Constipation/diarrhea tracking'},
+  {key:'ci_neuro',label:'Neuropathy / tingling',desc:'Numbness in hands or feet'},
+];
+const SETTINGS_MOD_DEFS = [
+  {key:'mod_drain',label:'Drain log',desc:'OFF by default — enable if drains still in place'},
+  {key:'mod_weight',label:'Weekly weight tracker',desc:'Log weight trends over time'},
+  {key:'mod_meds',label:'Medication log',desc:'Track medications and their effectiveness'},
+  {key:'mod_journal',label:'Body & identity journal',desc:'Private space for how you feel about your body'},
+  {key:'mod_calendar',label:'Calendar heatmap',desc:'Monthly view with fatigue colour coding — off by default'},
+];
+
+function renderSettings(){
+  const ct=$('settings-checkin-toggles'); ct.innerHTML='';
+  SETTINGS_CI_DEFS.forEach(def=>{
+    const row=document.createElement('div'); row.className='toggle-row';
+    const locked=def.locked;
+    row.innerHTML=`<div class="toggle-row-info"><strong>${def.label}</strong><span>${def.desc}</span></div>
+      <label class="toggle"${locked?' title="This cannot be turned off"':''}>
+        <input type="checkbox"${settings[def.key]?' checked':''}${locked?' disabled':''}/>
+        <span class="toggle-slider"></span>
+      </label>`;
+    if(!locked) row.querySelector('input').addEventListener('change',e=>{saveSetting(def.key,e.target.checked);renderHome();renderDaySummary();});
+    ct.appendChild(row);
+  });
+
+  const mt=$('settings-module-toggles'); mt.innerHTML='';
+  SETTINGS_MOD_DEFS.forEach(def=>{
+    const row=document.createElement('div'); row.className='toggle-row';
+    row.innerHTML=`<div class="toggle-row-info"><strong>${def.label}</strong><span>${def.desc}</span></div>
+      <label class="toggle"><input type="checkbox"${settings[def.key]?' checked':''}/>
+        <span class="toggle-slider"></span>
+      </label>`;
+    row.querySelector('input').addEventListener('change',e=>{saveSetting(def.key,e.target.checked);applyModuleVisibility();});
+    mt.appendChild(row);
+  });
+
+  $('settings-name').value=userName;
+}
+
+$('settings-name-save').addEventListener('click',()=>{
+  userName=$('settings-name').value.trim();saveAll();toast('✓ Name saved!');renderHome();
+});
+
+function applyModuleVisibility(){
+  $('drain-module').style.display=settings.mod_drain?'block':'none';
+  $('weight-module').style.display=settings.mod_weight?'block':'none';
+  $('med-module').style.display=settings.mod_meds?'block':'none';
+  $('journal-module').style.display=settings.mod_journal?'block':'none';
+  $('calendar-module').style.display=settings.mod_calendar?'block':'none';
+}
+
+$('clear-data-btn').addEventListener('click',()=>{
+  if(!confirm('Clear all your data? This cannot be undone.'))return;
+  localStorage.clear(); location.reload();
+});
+
+// ═══════════════════════════════════════
+//  SHEET HELPERS
+// ═══════════════════════════════════════
+function openSheet(overlayId,sheetId){
+  $(overlayId).classList.add('open'); $(sheetId).classList.add('open');
+}
+function closeSheet(overlayId,sheetId){
+  $(overlayId).classList.remove('open'); $(sheetId).classList.remove('open');
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+function init(){
+  // Ensure today exists
+  getDay(todayISO);
+  renderHome();
+  renderMoves();
+  initFuel();
+  applyModuleVisibility();
+  renderSettings();
+  renderJournal();
+  initTrendControls();
+  // Open check-in if fatigue not logged today
+  setTimeout(maybeOpenCheckin, 600);
+}
+
+init();
+</script>
+</body>
+</html>
+<!--
+MANIFEST.JSON (save alongside index.html):
+{
+  "name":"Re:Cover Companion","short_name":"Re:Cover",
+  "description":"Your personal cancer recovery companion",
+  "start_url":"./index.html","display":"standalone",
+  "background_color":"#A8E6C3","theme_color":"#A8E6C3","orientation":"portrait",
+  "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png"},
+           {"src":"icon-512.png","sizes":"512x512","type":"image/png"}]
+}
+Add to <head>: <link rel="manifest" href="manifest.json"/>
+-->
